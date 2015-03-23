@@ -34,11 +34,14 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				.ObserveOn (RxApp.MainThreadScheduler)
 				.Dump ("Value")
 				.Subscribe (async args => {
+
+
 					var random = new Random();
 
 					var calculationObservable = Observable
 						.Interval(TimeSpan.FromMilliseconds(250))
-						.Zip(Observable.Range(random.Next(1, 5), random.Next(1, 25)), (t, r) => r)
+						.Zip(
+							Observable.Range(random.Next(1, 5), random.Next(1, 25)), (t, r) => r)
 						.Scan((previous, current) => previous * current);
 
 					var calculationDisposable = calculationObservable
@@ -50,6 +53,11 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					var result = await calculationObservable;
 
 					outputLabel.Text = string.Format("Calculation Complete", result);
+
+
+
+
+
 				});
 
 		}

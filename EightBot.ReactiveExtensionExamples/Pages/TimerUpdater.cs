@@ -24,17 +24,22 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				if(timerSubscription != null)
 					timerSubscription.Dispose();
 
-				timerSubscription = 
-					Observable
-						.Interval (TimeSpan.FromSeconds (1.5))
-						.ObserveOn(RxApp.MainThreadScheduler)
-						.Dump("Value")
-						.Subscribe (timeInterval => timerLabel.Text = string.Format("Last Interval: {0}", timeInterval));
+
+				var timerObs = Observable
+					.Interval (TimeSpan.FromSeconds (1.5))
+					.ObserveOn(RxApp.MainThreadScheduler)
+					.Dump("Value");
+
+					timerSubscription = 
+						timerObs
+						.Subscribe (timeInterval => 
+							timerLabel.Text = 
+								string.Format("Last Interval: {0}", timeInterval));
+
 			};
 
 			stop = new Button{ Text = "Stop" };
 			stop.Clicked += (object sender, EventArgs e) => {
-
 				if(timerSubscription != null)
 					timerSubscription.Dispose();
 			};

@@ -21,6 +21,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			var button1Clicked = Observable.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x);
 
 			button2 = new Button{ Text = "Ray Stantz" };
+
 			var button2Clicked = Observable.FromEventPattern (x => button2.Clicked += x, x => button2.Clicked -= x);
 
 			Content = new StackLayout { 
@@ -37,7 +38,11 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				.Merge(button2Clicked)
 				.ObserveOn(RxApp.MainThreadScheduler)
 				.Dump("Value")
-				.Subscribe (args => outputLabel.Text = string.Format("Who merged the Streams?:{0}{1}", Environment.NewLine, ((Button)args.Sender).Text));
+				.Subscribe (args => 
+					outputLabel.Text = 
+					string.Format("Who merged the Streams?:{0}{1}", 
+						Environment.NewLine, 
+						((Button)args.Sender).Text));
 
 		}
 	}

@@ -27,9 +27,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				.FromEventPattern<EventHandler<TextChangedEventArgs>, TextChangedEventArgs> (
 					x => textEntry.TextChanged += x, 
 					x => textEntry.TextChanged -= x)
+
 				.Delay (TimeSpan.FromSeconds (2.5))
+
 				.Dump("Values")
+
 				.ObserveOn (RxApp.MainThreadScheduler)
+
 				.Subscribe (args => delayedLabel.Text = args.EventArgs.NewTextValue);
 
 		}

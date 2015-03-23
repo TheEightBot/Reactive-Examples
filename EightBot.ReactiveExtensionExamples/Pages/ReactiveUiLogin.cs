@@ -28,6 +28,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			};
 
 			this.Bind (ViewModel, vm => vm.EmailAddress, c => c.emailEntry.Text);
+
 			this.Bind (ViewModel, vm => vm.Password, c => c.passwordEntry.Text);
 		}
 
