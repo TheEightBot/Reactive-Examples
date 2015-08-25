@@ -37,10 +37,10 @@ namespace EightBot.ReactiveExtensionExamples
 				//TODO: Demo 12: Simple Login With Validation and Property Helpers
 				//new Pages.ReactiveUiLoginWithValidationWithProperty ();
 				//TODO: Demo 13: Simple Login With Commands
-				//new Pages.ReactiveUiLoginWithCommand ();
+				new Pages.ReactiveUiLoginWithCommand ();
 
 				//TODO: Demo 14: Color Slider Example
-				new Pages.ReactiveUiColorSlider ();
+				//new Pages.ReactiveUiColorSlider ();
 
 		}
 

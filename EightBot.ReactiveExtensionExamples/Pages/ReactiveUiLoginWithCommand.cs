@@ -32,9 +32,11 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 			this.Bind (ViewModel, vm => vm.EmailAddress, c => c.emailEntry.Text);
 			this.Bind (ViewModel, vm => vm.Password, c => c.passwordEntry.Text);
-			this.Bind(ViewModel, vm => vm.IsLoading, c => c.loading.IsRunning);
-			this.Bind(ViewModel, vm => vm.IsLoading, c => c.loading.IsVisible);
-			this.Bind (ViewModel, vm => vm.IsValid, c => c.login.IsEnabled);
+
+			this.OneWayBind (ViewModel, vm => vm.IsLoading, c => c.loading.IsRunning);
+			this.OneWayBind (ViewModel, vm => vm.IsLoading, c => c.loading.IsVisible);
+
+			this.OneWayBind (ViewModel, vm => vm.IsValid, c => c.login.IsEnabled);
 
 			//this.BindCommand (ViewModel, vm => vm.PerformLogin, c => c.login);
 			Observable.FromEventPattern (x => login.Clicked += x, x => login.Clicked -= x)

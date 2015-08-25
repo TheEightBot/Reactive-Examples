@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using ReactiveUI;
 using EightBot.ReactiveExtensionExamples.Utilities;
+using System.Threading.Tasks;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -30,6 +31,14 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			this.Bind (ViewModel, vm => vm.EmailAddress, c => c.emailEntry.Text);
 
 			this.Bind (ViewModel, vm => vm.Password, c => c.passwordEntry.Text);
+
+
+			Task.Run (async () => {
+				
+				await Task.Delay(2000);
+				Xamarin.Forms.Device.BeginInvokeOnMainThread(() => 
+					ViewModel.EmailAddress = "test@test.com");
+			});
 		}
 
 		public static readonly BindableProperty ViewModelProperty = 

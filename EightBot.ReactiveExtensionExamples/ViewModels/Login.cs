@@ -17,7 +17,7 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 
 		public string Password {
 			get { return _password; }
-			set { this.RaiseAndSetIfChanged (ref _password, value); }
+			set { this.RaiseAndSetIfChanged (ref _password, value);}
 		}
 
 		public Login ()

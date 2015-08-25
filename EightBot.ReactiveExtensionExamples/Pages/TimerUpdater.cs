@@ -25,10 +25,11 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					timerSubscription.Dispose();
 
 
-				var timerObs = Observable
-					.Interval (TimeSpan.FromSeconds (1.5))
-					.ObserveOn(RxApp.MainThreadScheduler)
-					.Dump("Value");
+				var timerObs = 
+					Observable
+						.Interval (TimeSpan.FromSeconds (1.5))
+						.ObserveOn(RxApp.MainThreadScheduler)
+						.Dump("Value");
 
 					timerSubscription = 
 						timerObs
