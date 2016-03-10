@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	<color name="backgroundColor">#909DA5</color>
+</resources>

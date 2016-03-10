@@ -19,7 +19,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				Padding = new Thickness(40d),
 				Children = {
 					(textEntry = new Entry{ Placeholder = "Enter Some Text" }),
-					(delayedLabel = new Label { XAlign = TextAlignment.Center})
+					(delayedLabel = new Label { HorizontalTextAlignment = TextAlignment.Center})
 				}
 			};
 
@@ -29,8 +29,6 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					x => textEntry.TextChanged -= x)
 
 				.Throttle (TimeSpan.FromSeconds (2.5))	
-
-				.Dump("Values")
 				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (args => delayedLabel.Text = args.EventArgs.NewTextValue);
 

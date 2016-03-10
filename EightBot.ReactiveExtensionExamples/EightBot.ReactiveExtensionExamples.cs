@@ -8,25 +8,28 @@ namespace EightBot.ReactiveExtensionExamples
 	{
 		public App ()
 		{
-			MainPage = 
+			MainPage = new Pages.NavigationContainerPage ();
+
 				//TODO: Demo 1: Timer
-				//new Pages.TimerUpdater ();
+//				new Pages.TimerUpdater ();
 				//TODO: Demo 2: Timer with better event handling
-				//new Pages.TimerUpdaterObservableEvents ();
+//				new Pages.TimerUpdaterObservableEvents ();
 				//TODO: Demo 3: Delay Notifications
-				//new Pages.Delay ();
+//				new Pages.Delay ();
 				//TODO: Demo 4: Throttle Notifications
-				//new Pages.Throttle ();
+//				new Pages.Throttle ();
 				//TODO: Demo 5: Buffer Notifications
 				//new Pages.Buffer ();
 				//TODO: Demo 6: Buffer Notifications with Where Clause
 				//new Pages.BufferWithWhere ();
 				//TODO: Demo 7: Sample
-				//new Pages.Sample ();
+//				new Pages.Sample ();
 				//TODO: Demo 8: Merge Observables
-				//new Pages.Merge ();
+//				new Pages.Merge ();
 				//TODO: Demo 9: Async Support
-				//new Pages.Async ();
+//				new Pages.Async ();
+				//TODO: Demo 9.2: AsyncEvent Support
+				//new Pages.AsyncEvent ();
 
 				//SWITCHING GEARS TO REACTIVE UI
 
@@ -37,10 +40,10 @@ namespace EightBot.ReactiveExtensionExamples
 				//TODO: Demo 12: Simple Login With Validation and Property Helpers
 				//new Pages.ReactiveUiLoginWithValidationWithProperty ();
 				//TODO: Demo 13: Simple Login With Commands
-				new Pages.ReactiveUiLoginWithCommand ();
+				//new Pages.ReactiveUiLoginWithCommand ();
 
 				//TODO: Demo 14: Color Slider Example
-				//new Pages.ReactiveUiColorSlider ();
+//				new Pages.ReactiveUiColorSlider ();
 
 		}
 

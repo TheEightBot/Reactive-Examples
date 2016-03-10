@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Linq;
 using ReactiveUI;
 using System.Text.RegularExpressions;
 using System.Reactive;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EightBot.ReactiveExtensionExamples.ViewModels
 {
-	public class LoginWithCommand : ReactiveObject
+	public class Login : ReactiveObject
 	{
 		string _emailAddress;
 		public string EmailAddress {
@@ -35,14 +36,19 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 
 		public ReactiveCommand<Unit> PerformLogin;
 
-		public LoginWithCommand ()
+		public Login ()
 		{
 
 			PerformLogin = ReactiveCommand.CreateAsyncTask<Unit> (
+				this.WhenAnyValue(
+					x => x.IsLoading, 
+					x => x.IsValid, 
+					(isLoading, IsValid) => !isLoading && IsValid),
 				async _ => {
 					try {
 						IsLoading = true;
-						await Task.Delay (2500) /* Fake Web Service Call */;
+						var random = new Random();
+						await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
 					} finally {
 						IsLoading = false;
 					}

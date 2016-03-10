@@ -28,11 +28,6 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				var timerObs = 
 					Observable
 						.Interval (TimeSpan.FromSeconds (1.5))
-						.ObserveOn(RxApp.MainThreadScheduler)
-						.Dump("Value");
-
-					timerSubscription = 
-						timerObs
 						.Subscribe (timeInterval => 
 							timerLabel.Text = 
 								string.Format("Last Interval: {0}", timeInterval));

@@ -10,7 +10,11 @@ using Android.OS;
 
 namespace EightBot.ReactiveExtensionExamples.Droid
 {
-	[Activity (Label = "EightBot.ReactiveExtensionExamples.Droid", Icon = "@drawable/icon", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+	[Activity (
+		Label = "Rx Examples", 
+		Icon = "@android:color/transparent", 
+		ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation,
+		Theme = "@android:style/Theme.Holo.Light.DarkActionBar")]
 	public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsApplicationActivity
 	{
 		protected override void OnCreate (Bundle bundle)

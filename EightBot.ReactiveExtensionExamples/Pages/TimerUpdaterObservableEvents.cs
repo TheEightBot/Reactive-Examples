@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using ReactiveUI;
 using EightBot.ReactiveExtensionExamples.Utilities;
+using System.Reactive.Disposables;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -15,36 +16,12 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 		IDisposable timerSubscription;
 
+		readonly CompositeDisposable _subscriptions = new CompositeDisposable();
+
 		public TimerUpdaterObservableEvents ()
 		{
-
 			start = new Button{ Text = "Start" };
-
-			var startClicked = Observable.FromEventPattern (x => start.Clicked += x, x => start.Clicked -= x);
-
-			startClicked
-				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (args => {
-					if(timerSubscription != null)
-						timerSubscription.Dispose();
-
-					timerSubscription = 
-						Observable
-							.Interval (TimeSpan.FromSeconds (1.5))
-							.ObserveOn(RxApp.MainThreadScheduler)
-							.Dump("Value")
-							.Subscribe (timeInterval => timerLabel.Text = string.Format("Last Interval: {0}", timeInterval));
-				});
-
 			stop = new Button{ Text = "Stop" };
-			var stopClicked = Observable.FromEventPattern (x => stop.Clicked += x, x => stop.Clicked -= x);
-
-			stopClicked
-				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (args => {
-					if(timerSubscription != null)
-						timerSubscription.Dispose();
-				});
 
 			Content = new StackLayout { 
 				Padding = new Thickness(40d),
@@ -55,6 +32,49 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				}
 			};
 
+		}
+
+		protected override void OnAppearing ()
+		{
+			base.OnAppearing ();
+
+			var startClicked = 
+				Observable
+					.FromEventPattern (x => start.Clicked += x, x => start.Clicked -= x);
+
+			_subscriptions.Add (
+				startClicked
+					.Subscribe (args => {
+						if(timerSubscription != null)
+							timerSubscription.Dispose();
+
+						timerSubscription = 
+							Observable
+								.Interval (TimeSpan.FromSeconds (1.5))
+								.ObserveOn(RxApp.MainThreadScheduler)
+								.Subscribe (timeInterval => timerLabel.Text = string.Format("Last Interval: {0}", timeInterval));
+					})
+			);
+
+			var stopClicked = 
+				Observable
+					.FromEventPattern (x => stop.Clicked += x, x => stop.Clicked -= x);
+
+			_subscriptions.Add (
+				stopClicked
+					.ObserveOn (RxApp.MainThreadScheduler)
+					.Subscribe (args => {
+						if(timerSubscription != null)
+							timerSubscription.Dispose();
+					})
+			);
+		}
+
+		protected override void OnDisappearing ()
+		{
+			base.OnDisappearing ();
+
+			_subscriptions.Clear ();
 		}
 	}
 }
