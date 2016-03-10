@@ -22,11 +22,10 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 			set { this.RaiseAndSetIfChanged (ref _password, value); }
 		}
 			
-		bool _isLoading;
+		ObservableAsPropertyHelper<bool> _isLoading;
 
 		public bool IsLoading {
-			get { return _isLoading; }
-			set { this.RaiseAndSetIfChanged (ref _isLoading, value); }
+			get { return _isLoading.Value; }
 		}
 
 		ObservableAsPropertyHelper<bool> _isValid;
@@ -45,13 +44,8 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 					x => x.IsValid, 
 					(isLoading, IsValid) => !isLoading && IsValid),
 				async _ => {
-					try {
-						IsLoading = true;
-						var random = new Random();
-						await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
-					} finally {
-						IsLoading = false;
-					}
+					var random = new Random();
+					await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
 
 					return Unit.Default;
 				});
@@ -72,6 +66,9 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 						password.Length > 5
 					))
 				.ToProperty(this, v => v.IsValid, out _isValid);
+
+			this.PerformLogin.IsExecuting
+				.ToProperty (this, x => x.IsLoading, out _isLoading);
 		}
 	}
 }
