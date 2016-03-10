@@ -30,26 +30,13 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 
 		ObservableAsPropertyHelper<bool> _isValid;
 		public bool IsValid {
-			get { return _isValid.Value; }
+			get { return _isValid?.Value ?? false; }
 		}
 
 		public ReactiveCommand<Unit> PerformLogin;
 
 		public Login ()
 		{
-
-			PerformLogin = ReactiveCommand.CreateAsyncTask<Unit> (
-				this.WhenAnyValue(
-					x => x.IsLoading, 
-					x => x.IsValid, 
-					(isLoading, IsValid) => !isLoading && IsValid),
-				async _ => {
-					var random = new Random();
-					await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
-
-					return Unit.Default;
-				});
-
 			this.WhenAnyValue (e => e.EmailAddress, p => p.Password,
 				(emailAddress, password) =>
 					/* Item 1 is our email address */
@@ -66,6 +53,18 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 						password.Length > 5
 					))
 				.ToProperty(this, v => v.IsValid, out _isValid);
+
+			PerformLogin = ReactiveCommand.CreateAsyncTask<Unit> (
+				this.WhenAnyValue(
+					x => x.IsLoading, 
+					x => x.IsValid, 
+					(isLoading, IsValid) => !isLoading && IsValid),
+				async _ => {
+					var random = new Random();
+					await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
+
+					return Unit.Default;
+				});
 
 			this.PerformLogin.IsExecuting
 				.ToProperty (this, x => x.IsLoading, out _isLoading);
