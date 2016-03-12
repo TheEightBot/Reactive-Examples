@@ -7,6 +7,7 @@ using ReactiveUI;
 using EightBot.ReactiveExtensionExamples.Utilities;
 using System.Threading.Tasks;
 using System.Reactive.Disposables;
+using System.Reactive;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -14,7 +15,11 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 	{
 		Label outputLabel;
 		Button button1;
-			
+
+		IObservable<EventPattern<Object>>
+			button1ClickedObservable;
+
+		IObservable<int> calculationObservable;
 
 		protected override void SetupUserInterface ()
 		{
@@ -32,11 +37,11 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveExtensions ()
+		protected override void SetupReactiveObservables ()
 		{
 			var random = new Random();
 
-			var calculationObservable = 
+			calculationObservable = 
 				Observable
 					.Interval(TimeSpan.FromMilliseconds(250))
 					.Zip(
@@ -46,16 +51,29 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					.Do(val => System.Diagnostics.Debug.WriteLine("Next Value: {0}", val))
 					.Scan((previous, current) => previous * current * random.Next());
 
-			Observable
-				.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x)
+			button1ClickedObservable =
+				Observable
+						.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x);
+		}
+
+		protected override void SetupReactiveSubscriptions ()
+		{
+			button1ClickedObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (async args => {
-					outputLabel.Text = "Starting Calculation";
+					try {
+						button1.IsEnabled = false;
+						outputLabel.Text = "Starting Calculation";
 
-					var result = await calculationObservable;
+						var result = await calculationObservable;
 
-					outputLabel.Text = string.Format("Calculation Complete: {0}", result);
-				});
+						outputLabel.Text = string.Format("Calculation Complete: {0}", result);
+
+					} finally {
+						button1.IsEnabled = true;
+					}
+				})
+				.DisposeWith(SubscriptionDisposables);
 		}
 	}
 }

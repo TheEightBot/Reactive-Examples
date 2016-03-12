@@ -9,7 +9,6 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 	public class ColorSlider : ReactiveObject
 	{
 		int _red;
-
 		public int Red {
 			get { return _red; }
 			set { this.RaiseAndSetIfChanged (ref _red, value); }
@@ -34,9 +33,11 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 
 		public ColorSlider ()
 		{
-
-			this.WhenAnyValue (x => x.Red, x => x.Green, x => x.Blue,
-				(red, green, blue) => Color.FromArgb(255, red, green, blue))
+			this
+				.WhenAnyValue (
+					x => x.Red, x => x.Green, x => x.Blue,
+					(red, green, blue) => Color.FromArgb(255, red, green, blue)
+				)
 				.ToProperty(this, v => v.Color, out _color);
 		}
 	}

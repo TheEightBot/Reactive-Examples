@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using ReactiveUI;
 using EightBot.ReactiveExtensionExamples.Utilities;
+using System.Reactive;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -12,6 +13,10 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 	{
 		Label outputLabel;
 		Button button1, button2, button3, button4;
+
+		IObservable<EventPattern<Object>>
+			button1ClickedObservable, button2ClickedObservable,
+			button3ClickedObservable, button4ClickedObservable;
 
 		protected override void SetupUserInterface ()
 		{
@@ -45,25 +50,29 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 		}
 
-		protected override void SetupReactiveExtensions ()
+		protected override void SetupReactiveObservables ()
 		{
-			var button1Clicked = Observable.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x);
+			button1ClickedObservable = Observable.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x);
 
-			var button2Clicked = Observable.FromEventPattern (x => button2.Clicked += x, x => button2.Clicked -= x);
+			button2ClickedObservable = Observable.FromEventPattern (x => button2.Clicked += x, x => button2.Clicked -= x);
 
-			var button3Clicked = Observable.FromEventPattern (x => button3.Clicked += x, x => button3.Clicked -= x);
+			button3ClickedObservable = Observable.FromEventPattern (x => button3.Clicked += x, x => button3.Clicked -= x);
 
-			var button4Clicked = Observable.FromEventPattern (x => button4.Clicked += x, x => button4.Clicked -= x);
+			button4ClickedObservable = Observable.FromEventPattern (x => button4.Clicked += x, x => button4.Clicked -= x);
+		}
 
-			button1Clicked
-				.Merge(button2Clicked)
-				.Merge(button3Clicked)
-				.Merge(button4Clicked)
+		protected override void SetupReactiveSubscriptions ()
+		{
+			button1ClickedObservable
+				.Merge(button2ClickedObservable)
+				.Merge(button3ClickedObservable)
+				.Merge(button4ClickedObservable)
+				.Select(args => 
+					string.Format("Who merged the Streams?{0}{1}", Environment.NewLine, ((Button)args.Sender).Text)
+				)
 				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe (args => 
-					outputLabel.Text = 
-						string.Format("Who merged the Streams?:{0}{1}", Environment.NewLine, ((Button)args.Sender).Text)
-				);
+				.Subscribe (mergeString => outputLabel.Text = mergeString)
+				.DisposeWith(SubscriptionDisposables);
 		}
 			
 	}

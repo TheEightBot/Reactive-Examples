@@ -6,6 +6,8 @@ using System.Reactive.Concurrency;
 using ReactiveUI;
 using EightBot.ReactiveExtensionExamples.Utilities;
 using System.Threading.Tasks;
+using System.Reactive;
+using System.Collections.Generic;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -13,6 +15,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 	{
 		Entry textEntry;
 		StackLayout lastEntries;
+
+		IObservable<IList<EventPattern<TextChangedEventArgs>>> textEntryObservable;
 
 		protected override void SetupUserInterface ()
 		{
@@ -32,23 +36,37 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveExtensions ()
+		protected override void SetupReactiveObservables ()
 		{
-			Observable
-				.FromEventPattern<EventHandler<TextChangedEventArgs>, TextChangedEventArgs> (
+			textEntryObservable =
+				Observable
+					.FromEventPattern<EventHandler<TextChangedEventArgs>, TextChangedEventArgs> (
 					x => textEntry.TextChanged += x, 
-					x => textEntry.TextChanged -= x)
-				.Buffer (TimeSpan.FromSeconds (2.5))
+					x => textEntry.TextChanged -= x
+				)
+				.Buffer (TimeSpan.FromSeconds (2.5));
+		}
+
+		protected override void SetupReactiveSubscriptions ()
+		{
+			textEntryObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (async argsList => {
-					var processedValues = await Task.Run (() => string.Join(Environment.NewLine, argsList.Select(args => args.EventArgs.NewTextValue).Reverse().ToList()));
+					var processedValues = 
+						await Task.Run (() => 
+							string.Join(
+								Environment.NewLine, 
+								argsList.Select(args => args.EventArgs.NewTextValue).Reverse().ToList()
+							)
+						);
 
 					if(argsList.Any())
 						lastEntries.Children.Insert(
 							0, 
 							new Label { Text = processedValues }
 						);
-				});
+				})
+				.DisposeWith(SubscriptionDisposables);
 		}
 	}
 }

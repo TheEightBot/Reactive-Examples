@@ -32,7 +32,6 @@
   <ItemGroup>
     <Compile Include="EightBot.ReactiveExtensionExamples.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Pages\TimerUpdater.cs" />
     <Compile Include="Utilities\IObservableExtensions.cs" />
     <Compile Include="Pages\TimerUpdaterObservableEvents.cs" />
     <Compile Include="Pages\Delay.cs" />

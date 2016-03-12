@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using ReactiveUI;
 using EightBot.ReactiveExtensionExamples.Utilities;
+using System.Reactive;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -12,6 +13,15 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 	{
 		Entry textEntry;
 		WebView webView;
+
+		IObservable<EventPattern<WebNavigatingEventArgs>>
+			webViewNavigatingObservable;
+
+		IObservable<EventPattern<WebNavigatedEventArgs>>
+			webViewNavigatedObservable;
+
+		IObservable<string>
+			textEntryObservable;
 
 		protected override void SetupUserInterface ()
 		{
@@ -29,31 +39,48 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveExtensions ()
+		protected override void SetupReactiveObservables ()
 		{
-			Observable
-				.FromEventPattern<EventHandler<WebNavigatingEventArgs>, WebNavigatingEventArgs> (
-					x => webView.Navigating += x, 
-					x => webView.Navigating -= x)
-				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (_ => webView.FadeTo(0.5d));
+			webViewNavigatingObservable =
+				Observable
+					.FromEventPattern<EventHandler<WebNavigatingEventArgs>, WebNavigatingEventArgs> (
+						x => webView.Navigating += x, 
+						x => webView.Navigating -= x
+					);
 
-			Observable
-				.FromEventPattern<EventHandler<WebNavigatedEventArgs>, WebNavigatedEventArgs> (
-					x => webView.Navigated += x, 
-					x => webView.Navigated -= x)
-				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (_ => webView.FadeTo(1d));
+			webViewNavigatedObservable =
+				Observable
+					.FromEventPattern<EventHandler<WebNavigatedEventArgs>, WebNavigatedEventArgs> (
+						x => webView.Navigated += x, 
+						x => webView.Navigated -= x
+					);
 
-			Observable
-				.FromEventPattern<EventHandler<TextChangedEventArgs>, TextChangedEventArgs> (
-					x => textEntry.TextChanged += x, 
-					x => textEntry.TextChanged -= x)
-				.Sample (TimeSpan.FromSeconds (2))
+			textEntryObservable =
+				Observable
+					.FromEventPattern<EventHandler<TextChangedEventArgs>, TextChangedEventArgs> (
+						x => textEntry.TextChanged += x, 
+						x => textEntry.TextChanged -= x
+					)
+					.Sample (TimeSpan.FromSeconds (2))
+					.Select(args => 
+						string.Format("https://frinkiac.com/?q={0}", args.EventArgs.NewTextValue.Replace(" ", "+"))
+					);
+		}
+
+		protected override void SetupReactiveSubscriptions ()
+		{
+			webViewNavigatingObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
-				.Select(args => 
-					string.Format("https://frinkiac.com/?q={0}", args.EventArgs.NewTextValue.Replace(" ", "+"))
-				)
+				.Subscribe (_ => webView.FadeTo(0.5d))
+				.DisposeWith(SubscriptionDisposables);
+
+			webViewNavigatedObservable
+				.ObserveOn (RxApp.MainThreadScheduler)
+				.Subscribe (_ => webView.FadeTo(1d))
+				.DisposeWith(SubscriptionDisposables);
+
+			textEntryObservable
+				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (searchUrl => {
 					try {
 						webView.Source = searchUrl;
@@ -61,7 +88,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						webView.Source = "https://frinkiac.com/caption/S04E05/1135500";
 					}
 
-				});
+				})
+				.DisposeWith(SubscriptionDisposables);
 		}
 	}
 }

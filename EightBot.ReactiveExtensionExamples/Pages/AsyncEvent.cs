@@ -7,6 +7,7 @@ using ReactiveUI;
 using EightBot.ReactiveExtensionExamples.Utilities;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
+using System.Reactive;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -14,6 +15,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 	{
 		Label outputLabel;
 		Button button1, button2;
+
+		IObservable<EventPattern<Object>>
+			button1ClickedObservable, button2ClickedObservable;
+
+		IObservable<long> calculationObservable;
+
+		IDisposable calculationSubscription;
 
 		protected override void SetupUserInterface ()
 		{
@@ -33,13 +41,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveExtensions ()
+		protected override void SetupReactiveObservables ()
 		{
-			var button1Clicked = 
+			button1ClickedObservable = 
 				Observable
 					.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x);
 
-			var button2Clicked = 
+			button2ClickedObservable = 
 				Observable
 					.FromEventPattern (x => button2.Clicked += x, x => button2.Clicked -= x)
 					.Do(args => {  
@@ -47,33 +55,47 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					})
 					.FirstAsync ();
 
-			var calculationObservable = 
+			calculationObservable = 
 				Observable
 					.Interval (TimeSpan.FromMilliseconds (250))
 					.Do (val => System.Diagnostics.Debug.WriteLine ("Next Value: {0}", val))
 					.Scan ((previous, current) => previous + current);
+		}
 
-			button1Clicked
+		protected override void SetupReactiveSubscriptions ()
+		{
+			button1ClickedObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (async args => {
+					try {
+						button1.IsEnabled = false;
 
-					//Start Calculating
-					var calculationSubscription = 
-						calculationObservable
-							.ObserveOn(RxApp.MainThreadScheduler)
-							.Subscribe(val => {
-								outputLabel.Text = string.Format("Calculation Value: {0}", val);
-							});
+						//Start Calculating
+						calculationSubscription = 
+							calculationObservable
+								.ObserveOn(RxApp.MainThreadScheduler)
+								.Subscribe(val => {
+									outputLabel.Text = string.Format("Calculation Value: {0}", val);
+								});
+						
+						//This will only get the first click of the button after we start listening
+						await button2ClickedObservable;
 
-					//This will only get the first click of the button after we start listening
-					await button2Clicked;
+						calculationSubscription?.Dispose();
 
-					//Unsubscribe from calculations, this will stop the calculation process
-					calculationSubscription.Dispose();
+						outputLabel.Text = string.Format("Clicked Stop at " + DateTime.Now);
+					} finally {
+						button1.IsEnabled = true;
+					}
+				})
+				.DisposeWith(SubscriptionDisposables);
+		}
 
-					outputLabel.Text = string.Format("Clicked Stop at " + DateTime.Now);
+		protected override void OnDisappearing ()
+		{
+			base.OnDisappearing ();
 
-				});
+			calculationSubscription?.Dispose();
 		}
 	}
 }

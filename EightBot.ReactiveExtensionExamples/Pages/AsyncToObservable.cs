@@ -8,6 +8,7 @@ using ReactiveUI;
 using EightBot.ReactiveExtensionExamples.Utilities;
 using System.Threading.Tasks;
 using System.Reactive.Disposables;
+using System.Reactive;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -16,6 +17,9 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		Label outputLabel;
 		Button button1;
 		ActivityIndicator loading;
+
+		IObservable<EventPattern<Object>>
+			button1ClickedObservable;
 
 		protected override void SetupUserInterface ()
 		{
@@ -33,10 +37,16 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveExtensions ()
+		protected override void SetupReactiveObservables ()
 		{
-			Observable
-				.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x)
+			button1ClickedObservable =
+				Observable
+					.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x);
+		}
+
+		protected override void SetupReactiveSubscriptions ()
+		{
+			button1ClickedObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (async args => {
 
@@ -46,11 +56,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					loading.IsRunning = true;
 
 					try {
-						var result = await Observable.FromAsync(() => PerformCalculation())
-							.Timeout(TimeSpan.FromMilliseconds(300))
-							.Retry(5)
-							.Catch<int, TimeoutException>(tex => Observable.Return(-1))
-							.Catch<int, Exception>(ex => Observable.Return(-100));
+						var result = 
+							await Observable
+								.FromAsync(() => PerformCalculation())
+								.Timeout(TimeSpan.FromMilliseconds(300))
+								.Retry(5)
+								.Catch<int, TimeoutException>(tex => Observable.Return(-1))
+								.Catch<int, Exception>(ex => Observable.Return(-100));
 
 						outputLabel.Text = 
 							result >= 0
@@ -64,7 +76,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					} finally {
 						loading.IsRunning = false;
 					}
-				});
+				})
+				.DisposeWith(SubscriptionDisposables);
 		}
 
 
