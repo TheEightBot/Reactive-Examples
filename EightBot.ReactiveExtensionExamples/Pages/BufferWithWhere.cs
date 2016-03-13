@@ -44,7 +44,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						x => textEntry.TextChanged += x, 
 						x => textEntry.TextChanged -= x
 					)
-					.Buffer (TimeSpan.FromSeconds (2.5))
+					.Buffer (TimeSpan.FromSeconds (3))
 					.Where (argsList => argsList != null && argsList.Any ());
 		}
 
@@ -61,11 +61,27 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 							)
 						);
 
-					if(argsList.Any())
+					if(argsList.Any()) {
 						lastEntries.Children.Insert(
 							0, 
 							new Label { Text = processedValues }
 						);
+
+						lastEntries.Children
+							.Insert(
+								1, 
+								new Label { 
+									Text = string.Format("Received at {0:H:mm:ss}", DateTime.Now), 
+									FontAttributes = FontAttributes.Italic, 
+									FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
+									TextColor = Color.Gray
+								});
+						
+						lastEntries.Children
+							.Insert(
+								2, 
+								new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
+					}
 				})
 				.DisposeWith(SubscriptionDisposables);
 		}

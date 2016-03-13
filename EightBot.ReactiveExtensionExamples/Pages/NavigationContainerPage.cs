@@ -37,6 +37,9 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						case NavigationPages.Delay:
 							selectedPage = new Pages.Delay();
 							break;
+						case NavigationPages.Throttle:
+							selectedPage = new Pages.Throttle();
+							break;
 						case NavigationPages.Buffer:
 							selectedPage = new Pages.Buffer();
 							break;
@@ -78,6 +81,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			Async,
 			AsyncEvents,
 			Delay,
+			Throttle,
 			Buffer,
 			BufferWithWhere,
 			Merge,
@@ -117,6 +121,12 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Delay)),
 				};
 				navigationContainer.Children.Add(delay);
+
+				var throttle = new NavigationButton { 
+					Text = "Throttle",
+					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Throttle)),
+				};
+				navigationContainer.Children.Add(throttle);
 
 				var buffer = new NavigationButton { 
 					Text = "Buffer",

@@ -61,7 +61,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						x => textEntry.TextChanged += x, 
 						x => textEntry.TextChanged -= x
 					)
-					.Sample (TimeSpan.FromSeconds (2))
+					.Sample (TimeSpan.FromSeconds (3))
 					.Select(args => 
 						string.Format("https://frinkiac.com/?q={0}", args.EventArgs.NewTextValue.Replace(" ", "+"))
 					);
@@ -87,7 +87,6 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					} catch (Exception) {
 						webView.Source = "https://frinkiac.com/caption/S04E05/1135500";
 					}
-
 				})
 				.DisposeWith(SubscriptionDisposables);
 		}
