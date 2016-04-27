@@ -17,7 +17,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		Entry textEntry;
 		StackLayout lastEntries;
 
-		IObservable<IList<EventPattern<TextChangedEventArgs>>> textEntryObservable;
+		IObservable<string> textEntryObservable;
 
 		protected override void SetupUserInterface ()
 		{
@@ -46,43 +46,39 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					x => textEntry.TextChanged += x, 
 					x => textEntry.TextChanged -= x
 				)
-				.Buffer (TimeSpan.FromSeconds (3));
+				.Buffer (TimeSpan.FromSeconds (3))
+				.Select(argsList => 
+					string.Join(
+						Environment.NewLine, 
+						argsList.Select(args => args.EventArgs.NewTextValue).Reverse().ToList()
+					)
+				);
 		}
 
 		protected override void SetupReactiveSubscriptions ()
 		{
 			textEntryObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (async argsList => {
-					var processedValues = 
-						await Task.Run (() => 
-							string.Join(
-								Environment.NewLine, 
-								argsList.Select(args => args.EventArgs.NewTextValue).Reverse().ToList()
-							)
-						);
+				.Subscribe (async text => {
+					lastEntries.Children.Insert(
+						0, 
+						new Label { Text = text }
+					);
 
-					if(argsList.Any()) {
-						lastEntries.Children.Insert(
-							0, 
-							new Label { Text = processedValues }
-						);
+					lastEntries.Children
+						.Insert(
+							1, 
+							new Label { 
+								Text = string.Format("Received at {0:H:mm:ss}", DateTime.Now), 
+								FontAttributes = FontAttributes.Italic, 
+								FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
+								TextColor = Color.Gray
+							});
 
-						lastEntries.Children
-							.Insert(
-								1, 
-								new Label { 
-									Text = string.Format("Received at {0:H:mm:ss}", DateTime.Now), 
-									FontAttributes = FontAttributes.Italic, 
-									FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
-									TextColor = Color.Gray
-								});
-						
-						lastEntries.Children
-							.Insert(
-								2, 
-								new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
-					}
+					lastEntries.Children
+						.Insert(
+							2, 
+							new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
 				})
 				.DisposeWith(SubscriptionDisposables);
 		}

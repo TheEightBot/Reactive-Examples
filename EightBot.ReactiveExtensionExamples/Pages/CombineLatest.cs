@@ -21,6 +21,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			greenValueChangedObservable,
 			blueValueChangedObservable;
 
+		IObservable<Color> colorObservable;
+
 		public CombineLatest ()
 		{
 			Title = "Combine Latest";
@@ -73,31 +75,26 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					)
 					.StartWith(new EventPattern<ValueChangedEventArgs>(null, new ValueChangedEventArgs(0, 0)))
 					.Select(result => (int)result.EventArgs.NewValue);
+
+
+			colorObservable = 
+				redValueChangedObservable
+					.CombineLatest (
+						greenValueChangedObservable,
+						blueValueChangedObservable,
+						(r, g, b) =>  Color.FromRgb (r, g, b)
+					);
 		}
 
 		protected override void SetupReactiveSubscriptions ()
 		{
 			base.SetupReactiveSubscriptions ();
 
-			SubscriptionDisposables.Add (
-				redValueChangedObservable
-					.CombineLatest (
-						greenValueChangedObservable,
-						blueValueChangedObservable,
-						(r, g, b) => {
-						return Color.FromRgb (r, g, b);
-					})
-					.Subscribe (color => {
-						Device.BeginInvokeOnMainThread(() => colorDisplay.BackgroundColor = color);
-					})
-			);
-		}
-
-		protected override void OnDisappearing ()
-		{
-			base.OnDisappearing ();
-
-			SubscriptionDisposables.Clear ();
+			colorObservable
+				.Subscribe (color => {
+					Device.BeginInvokeOnMainThread (() => colorDisplay.BackgroundColor = color);
+				})
+				.DisposeWith (SubscriptionDisposables);
 		}
 	}
 }

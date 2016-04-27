@@ -71,7 +71,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		{
 			webViewNavigatingObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (_ => webView.FadeTo(0.5d))
+				.Subscribe (_ => webView.FadeTo(0d))
 				.DisposeWith(SubscriptionDisposables);
 
 			webViewNavigatedObservable
@@ -84,7 +84,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				.Subscribe (searchUrl => {
 					try {
 						webView.Source = searchUrl;
-					} catch (Exception) {
+					} catch {
 						webView.Source = "https://frinkiac.com/caption/S04E05/1135500";
 					}
 				})

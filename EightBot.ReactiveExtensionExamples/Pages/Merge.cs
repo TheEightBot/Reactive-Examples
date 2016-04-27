@@ -18,6 +18,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			button1ClickedObservable, button2ClickedObservable,
 			button3ClickedObservable, button4ClickedObservable;
 
+		IObservable<string> allButtonsObservable;
+
 		protected override void SetupUserInterface ()
 		{
 			Title = "Rx - Merge";
@@ -60,19 +62,23 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			button3ClickedObservable = Observable.FromEventPattern (x => button3.Clicked += x, x => button3.Clicked -= x);
 
 			button4ClickedObservable = Observable.FromEventPattern (x => button4.Clicked += x, x => button4.Clicked -= x);
+		
+			allButtonsObservable = 
+				button1ClickedObservable
+					.Merge (button2ClickedObservable)
+					.Merge (button3ClickedObservable)
+					.Merge (button4ClickedObservable)
+					.Select (args => 
+						string.Format ("Who merged the Streams?{0}{1}", 
+							Environment.NewLine, ((Button)args.Sender).Text)
+					);
 		}
 
 		protected override void SetupReactiveSubscriptions ()
 		{
-			button1ClickedObservable
-				.Merge(button2ClickedObservable)
-				.Merge(button3ClickedObservable)
-				.Merge(button4ClickedObservable)
-				.Select(args => 
-					string.Format("Who merged the Streams?{0}{1}", Environment.NewLine, ((Button)args.Sender).Text)
-				)
+			allButtonsObservable
 				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe (mergeString => outputLabel.Text = mergeString)
+				.Subscribe (text => outputLabel.Text = text)
 				.DisposeWith(SubscriptionDisposables);
 		}
 			

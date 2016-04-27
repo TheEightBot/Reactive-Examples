@@ -15,7 +15,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		Entry textEntry;
 		StackLayout lastEntries;
 
-		IObservable<EventPattern<TextChangedEventArgs>> textEntryObservable;
+		IObservable<string> textEntryObservable;
 
 		protected override void SetupUserInterface ()
 		{
@@ -44,18 +44,19 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						x => textEntry.TextChanged += x, 
 						x => textEntry.TextChanged -= x
 					)
-					.Delay (TimeSpan.FromSeconds (3));
+					.Delay (TimeSpan.FromSeconds (3))
+					.Select(args => args.EventArgs.NewTextValue);
 		}
 
 		protected override void SetupReactiveSubscriptions ()
 		{
 			textEntryObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (args => {
+				.Subscribe (text => {
 					lastEntries.Children
 						.Insert(
 							0, 
-							new Label { Text = args.EventArgs.NewTextValue });
+							new Label { Text = text });
 					lastEntries.Children
 						.Insert(
 							1, 

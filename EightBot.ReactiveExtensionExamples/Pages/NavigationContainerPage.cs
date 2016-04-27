@@ -113,7 +113,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				var navigationContainer = new StackLayout {
 					
 					Padding = new Thickness(8d),
-					Spacing = 8d
+					Spacing = 24d
 				};
 				scrollContainer.Content = navigationContainer;
 
