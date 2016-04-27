@@ -54,11 +54,14 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 					))
 				.ToProperty(this, v => v.IsValid, out _isValid);
 
-			PerformLogin = ReactiveCommand.CreateAsyncTask<Unit> (
-				this.WhenAnyValue(
+			var canExecuteLogin = 
+				this.WhenAnyValue (
 					x => x.IsLoading, 
 					x => x.IsValid, 
-					(isLoading, IsValid) => !isLoading && IsValid),
+					(isLoading, IsValid) => !isLoading && IsValid);
+			
+			PerformLogin = ReactiveCommand.CreateAsyncTask<Unit> (
+				canExecuteLogin,
 				async _ => {
 					var random = new Random(DateTime.Now.Millisecond);
 					await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
