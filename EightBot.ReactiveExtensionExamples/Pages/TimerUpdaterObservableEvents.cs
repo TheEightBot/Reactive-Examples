@@ -68,13 +68,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 					timerSubscription =
 						intervalObservable
-							.ObserveOn (RxApp.MainThreadScheduler)
-							.Subscribe (timeInterval => timerLabel.Text = timeInterval);
+							.Subscribe (timeInterval => 
+								Device.BeginInvokeOnMainThread(() => timerLabel.Text = timeInterval)
+							);
 				})
 				.DisposeWith (SubscriptionDisposables);
 
 			stopClickedObservable
-				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (args => timerSubscription?.Dispose ())
 				.DisposeWith (SubscriptionDisposables);
 		}

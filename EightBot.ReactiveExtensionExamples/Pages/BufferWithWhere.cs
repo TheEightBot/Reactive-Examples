@@ -58,27 +58,28 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		protected override void SetupReactiveSubscriptions ()
 		{
 			textEntryObservable
-				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (async text => {
-					lastEntries.Children.Insert(
-						0, 
-						new Label { Text = text }
-					);
+				.Subscribe (text => {
+					Device.BeginInvokeOnMainThread(() => {
+						lastEntries.Children.Insert(
+							0, 
+							new Label { Text = text }
+						);
 
-					lastEntries.Children
-						.Insert(
-							1, 
-							new Label { 
-								Text = string.Format("Received at {0:H:mm:ss}", DateTime.Now), 
-								FontAttributes = FontAttributes.Italic, 
-								FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
-								TextColor = Color.Gray
-							});
-					
-					lastEntries.Children
-						.Insert(
-							2, 
-							new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
+						lastEntries.Children
+							.Insert(
+								1, 
+								new Label { 
+									Text = string.Format("Received at {0:H:mm:ss}", DateTime.Now), 
+									FontAttributes = FontAttributes.Italic, 
+									FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
+									TextColor = Color.Gray
+								});
+						
+						lastEntries.Children
+							.Insert(
+								2, 
+								new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
+					});
 				})
 				.DisposeWith(SubscriptionDisposables);
 		}

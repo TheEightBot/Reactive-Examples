@@ -77,8 +77,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		protected override void SetupReactiveSubscriptions ()
 		{
 			allButtonsObservable
-				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe (text => outputLabel.Text = text)
+				.Subscribe (text => Device.BeginInvokeOnMainThread(() => outputLabel.Text = text))
 				.DisposeWith(SubscriptionDisposables);
 		}
 			

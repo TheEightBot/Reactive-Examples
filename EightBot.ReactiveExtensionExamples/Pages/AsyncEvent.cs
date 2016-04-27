@@ -36,8 +36,10 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				Children = {
 					button1, 
 					button2,
-					(outputLabel = new Label { XAlign = TextAlignment.Center, Text = "Let's calcuNOW, not calcuLATEr" }),
-
+					(outputLabel = new Label { 
+						HorizontalTextAlignment = TextAlignment.Center, 
+						Text = "Let's calcuNOW, not calcuLATEr" 
+					})
 				}
 			};
 		}
@@ -64,27 +66,30 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		protected override void SetupReactiveSubscriptions ()
 		{
 			button1ClickedObservable
-				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (async args => {
 					try {
-						button1.IsEnabled = false;
+						Device.BeginInvokeOnMainThread(() => button1.IsEnabled = false);
 
 						//Start Calculating
 						calculationSubscription = 
 							calculationObservable
 								.ObserveOn(RxApp.MainThreadScheduler)
-								.Subscribe(val => {
-									outputLabel.Text = string.Format("Calculation Value: {0}", val);
-								});
+								.Subscribe(val => 
+									Device.BeginInvokeOnMainThread(() => 
+										outputLabel.Text = string.Format("Calculation Value: {0}", val)
+									)
+								);
 						
 						//This will only get the first click of the button after we start listening
 						await button2ClickedObservable;
 
 						calculationSubscription?.Dispose();
 
-						outputLabel.Text = string.Format("Clicked Stop at " + DateTime.Now);
+						Device.BeginInvokeOnMainThread(() => 
+							outputLabel.Text = string.Format("Clicked Stop at " + DateTime.Now)
+						);
 					} finally {
-						button1.IsEnabled = true;
+						Device.BeginInvokeOnMainThread(() => button1.IsEnabled = true);
 					}
 				})
 				.DisposeWith(SubscriptionDisposables);

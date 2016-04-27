@@ -52,11 +52,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		protected override void SetupReactiveSubscriptions ()
 		{
 			downloadClickedObservable
-				.ObserveOn(RxApp.TaskpoolScheduler)
 				.Subscribe (args => {
 					Device.BeginInvokeOnMainThread(() => download.IsEnabled = false);
-
-					akavacheQuery?.Dispose();
 
 					akavacheQuery = 
 						BlobCache.InMemory
@@ -65,12 +62,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 								() => DownloadRss (),
 								absoluteExpiration: DateTimeOffset.Now.AddSeconds (10d)
 							)
-							.ObserveOn (RxApp.MainThreadScheduler)
 							.Do (_ => System.Diagnostics.Debug.WriteLine ($"Received update at {DateTimeOffset.Now}"))
 							.Subscribe(
-								result => rssFeed.ItemsSource = result,
-								() => download.IsEnabled = true
-							);
+								result => Device.BeginInvokeOnMainThread(() => rssFeed.ItemsSource = result),
+								() => {
+									Device.BeginInvokeOnMainThread(() => download.IsEnabled = true);
+									akavacheQuery?.Dispose();
+								});
 				})
 				.DisposeWith(SubscriptionDisposables);
 		}

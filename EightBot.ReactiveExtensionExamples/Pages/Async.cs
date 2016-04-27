@@ -1,13 +1,12 @@
 ﻿using System;
-
-using Xamarin.Forms;
-using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using ReactiveUI;
-using EightBot.ReactiveExtensionExamples.Utilities;
-using System.Threading.Tasks;
-using System.Reactive.Disposables;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using EightBot.ReactiveExtensionExamples.Utilities;
+using ReactiveUI;
+using Xamarin.Forms;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -67,18 +66,23 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		protected override void SetupReactiveSubscriptions ()
 		{
 			downloadClickedObservable
-				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (async args => {
 					try {
-						download.IsEnabled = false;
-						outputLabel.Text = "Starting Calculation";
+						Device.BeginInvokeOnMainThread(() => {
+							download.IsEnabled = false;
+							outputLabel.Text = "Starting Calculation";
+						});
 
 						var result = await calculationObservable;
 
-						outputLabel.Text = string.Format("Calculation Complete: {0}", result);
+						Device.BeginInvokeOnMainThread(() =>
+							outputLabel.Text = string.Format("Calculation Complete: {0}", result)
+						);
 
 					} finally {
-						download.IsEnabled = true;
+						Device.BeginInvokeOnMainThread(() => 
+							download.IsEnabled = true
+						);
 					}
 				})
 				.DisposeWith(SubscriptionDisposables);

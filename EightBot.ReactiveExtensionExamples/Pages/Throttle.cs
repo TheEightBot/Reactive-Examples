@@ -44,8 +44,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						x => textEntry.TextChanged += x, 
 						x => textEntry.TextChanged -= x
 					)
-					.Throttle (TimeSpan.FromSeconds (2.5))
-					.Select(args => args.EventArgs.NewTextValue);;
+					.Throttle (TimeSpan.FromSeconds (3))
+					.Select(args => args.EventArgs.NewTextValue);
 		}
 
 		protected override void SetupReactiveSubscriptions ()
@@ -53,23 +53,27 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			textEntryObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (text => {
-					lastEntries.Children
-						.Insert(
-							0, 
-							new Label { Text = text });
-					lastEntries.Children
-						.Insert(
-							1, 
-							new Label { 
-								Text = string.Format("Received at {0:H:mm:ss}", DateTime.Now), 
-								FontAttributes = FontAttributes.Italic, 
-								FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
-								TextColor = Color.Gray
-							});
-					lastEntries.Children
-						.Insert(
-							2, 
-							new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
+					Device.BeginInvokeOnMainThread(() => {
+						lastEntries.Children
+							.Insert(
+								0, 
+								new Label { Text = text });
+						
+						lastEntries.Children
+							.Insert(
+								1, 
+								new Label { 
+									Text = string.Format("Received at {0:H:mm:ss}", DateTime.Now), 
+									FontAttributes = FontAttributes.Italic, 
+									FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
+									TextColor = Color.Gray
+								});
+						
+						lastEntries.Children
+							.Insert(
+								2, 
+								new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
+					});
 				})
 				.DisposeWith(SubscriptionDisposables);
 		}

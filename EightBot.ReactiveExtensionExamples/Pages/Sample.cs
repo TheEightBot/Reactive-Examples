@@ -70,23 +70,22 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		protected override void SetupReactiveSubscriptions ()
 		{
 			webViewNavigatingObservable
-				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (_ => webView.FadeTo(0d))
+				.Subscribe (_ => Device.BeginInvokeOnMainThread(() => webView.FadeTo(0d)))
 				.DisposeWith(SubscriptionDisposables);
 
 			webViewNavigatedObservable
-				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (_ => webView.FadeTo(1d))
+				.Subscribe (_ => Device.BeginInvokeOnMainThread(() => webView.FadeTo(1d)))
 				.DisposeWith(SubscriptionDisposables);
 
 			textEntryObservable
-				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (searchUrl => {
-					try {
-						webView.Source = searchUrl;
-					} catch {
-						webView.Source = "https://frinkiac.com/caption/S04E05/1135500";
-					}
+					Device.BeginInvokeOnMainThread(() => {
+						try {
+							webView.Source = searchUrl;
+						} catch {
+							webView.Source = "https://frinkiac.com/caption/S04E05/1135500";
+						}
+					});
 				})
 				.DisposeWith(SubscriptionDisposables);
 		}

@@ -141,17 +141,17 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				};
 				navigationContainer.Children.Add(bufferWithWhere);
 
-				var merge = new NavigationButton { 
-					Text = "Merge",
-					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Merge)),
-				};
-				navigationContainer.Children.Add(merge);
-
 				var sample = new NavigationButton { 
 					Text = "Sample",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Sample)),
 				};
 				navigationContainer.Children.Add(sample);
+
+				var merge = new NavigationButton { 
+					Text = "Merge",
+					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Merge)),
+				};
+				navigationContainer.Children.Add(merge);
 
 				var asyncToObservable = new NavigationButton { 
 					Text = "Mix Async With Observables",

@@ -48,14 +48,14 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		protected override void SetupReactiveSubscriptions ()
 		{
 			button1ClickedObservable
-				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (async args => {
 
-					outputLabel.TextColor = Color.Black;
-					outputLabel.Text = "Starting Calculation";
-
-					loading.IsRunning = true;
-
+					Device.BeginInvokeOnMainThread(() => {
+						outputLabel.TextColor = Color.Black;
+						outputLabel.Text = "Starting Calculation";
+						loading.IsRunning = true;
+					});
+						
 					try {
 						var result = 
 							await Observable.FromAsync(() => PerformCalculation())
@@ -64,24 +64,26 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 								.Catch<int, TimeoutException>(tex => Observable.Return(-1))
 								.Catch<int, Exception>(ex => Observable.Return(-100));
 
-						outputLabel.Text = 
-							result >= 0
-								? string.Format("Calculation Complete: {0}", result)
-								: result == -100
-									? "Listen, things went really bad." + Environment.NewLine + "Reconsider your life choices"
-									: "Bummer, it looks like your calculation failed";
+						Device.BeginInvokeOnMainThread(() => {
+							outputLabel.Text = 
+								result >= 0
+									? string.Format("Calculation Complete: {0}", result)
+									: result == -100
+										? "Listen, things went really bad." + Environment.NewLine + "Reconsider your life choices"
+										: "Bummer, it looks like your calculation failed";
 
-						if(result < 0)
-							outputLabel.TextColor = Color.Red;
+							if(result < 0)
+								outputLabel.TextColor = Color.Red;
+						});
 					} finally {
-						loading.IsRunning = false;
+						Device.BeginInvokeOnMainThread(() => loading.IsRunning = false);
 					}
 				})
 				.DisposeWith(SubscriptionDisposables);
 		}
 
 
-		//This is a faux web service
+		//Imagine this is a faux web service or similar
 		async Task<int> PerformCalculation (){
 			var random = new Random (DateTime.Now.Millisecond);
 
