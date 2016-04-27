@@ -33,12 +33,11 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 
 		public ColorSlider ()
 		{
-			this
-				.WhenAnyValue (
-					x => x.Red, x => x.Green, x => x.Blue,
-					(red, green, blue) => Color.FromArgb(255, red, green, blue)
-				)
-				.ToProperty(this, v => v.Color, out _color);
+			this.WhenAnyValue (
+				x => x.Red, x => x.Green, x => x.Blue,
+				(red, green, blue) => Color.FromArgb(255, red, green, blue)
+			)
+			.ToProperty(this, v => v.Color, out _color);
 		}
 	}
 }

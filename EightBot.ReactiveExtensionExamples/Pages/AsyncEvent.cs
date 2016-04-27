@@ -31,7 +31,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			button2 = new Button{ Text = "STOP" };
 
 			Content = new StackLayout { 
-				Padding = new Thickness(40d),
+				Padding = new Thickness(8d),
+				Spacing = 16d,
 				Children = {
 					button1, 
 					button2,
@@ -50,9 +51,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			button2ClickedObservable = 
 				Observable
 					.FromEventPattern (x => button2.Clicked += x, x => button2.Clicked -= x)
-					.Do(args => {  
-						System.Diagnostics.Debug.WriteLine("Button 2 Clicked");
-					})
+					.Do(args => System.Diagnostics.Debug.WriteLine("Button 2 Clicked"))
 					.FirstAsync ();
 
 			calculationObservable = 

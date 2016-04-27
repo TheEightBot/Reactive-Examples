@@ -39,14 +39,14 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 		{
 			this.WhenAnyValue (e => e.EmailAddress, p => p.Password,
 				(emailAddress, password) =>
-					/* Item 1 is our email address */
+					/* Validate our email address */
 					(
 						!string.IsNullOrEmpty(emailAddress)
 							&&
 						Regex.Matches(emailAddress, "^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$").Count == 1
 					)
 					&&
-					/* Item 2 is our password */
+					/* Validate our password */
 					(
 						!string.IsNullOrEmpty(password) 
 							&&
@@ -60,7 +60,7 @@ namespace EightBot.ReactiveExtensionExamples.ViewModels
 					x => x.IsValid, 
 					(isLoading, IsValid) => !isLoading && IsValid),
 				async _ => {
-					var random = new Random();
+					var random = new Random(DateTime.Now.Millisecond);
 					await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
 
 					return Unit.Default;

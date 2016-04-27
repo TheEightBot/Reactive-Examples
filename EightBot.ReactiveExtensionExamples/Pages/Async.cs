@@ -13,25 +13,33 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 {
 	public class Async : PageBase
 	{
-		Label outputLabel;
-		Button button1;
+		Label outputLabel, calculationProgress;
+		Button download;
 
 		IObservable<EventPattern<Object>>
-			button1ClickedObservable;
+			downloadClickedObservable;
 
-		IObservable<int> calculationObservable;
+		IObservable<long> calculationObservable;
 
 		protected override void SetupUserInterface ()
 		{
 			Title = "Rx - Async";
 
-			button1 = new Button{ Text = "Calculate" };
+			download = new Button{ Text = "Calculate" };
 
 			Content = new StackLayout { 
-				Padding = new Thickness(40d),
+				Padding = new Thickness(8d),
+				Spacing = 16d,
 				Children = {
-					button1, 
-					(outputLabel = new Label { HorizontalTextAlignment = TextAlignment.Center, Text = "Let's calcuNOW, not calcuLATEr" }),
+					download, 
+					(calculationProgress = 
+						new Label { 
+							HorizontalTextAlignment = TextAlignment.Center, 
+							FontAttributes = FontAttributes.Italic,
+							Text = "Next Value: " 
+						}
+					),
+					(outputLabel = new Label { HorizontalTextAlignment = TextAlignment.Center, Text = "Calculation Result" }),
 
 				}
 			};
@@ -39,30 +47,30 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 		protected override void SetupReactiveObservables ()
 		{
-			var random = new Random();
+			var random = new Random(DateTime.Now.Millisecond);
 
 			calculationObservable = 
 				Observable
-					.Interval(TimeSpan.FromMilliseconds(250))
+					.Interval(TimeSpan.FromMilliseconds(random.Next(100, 300)))
 					.Zip(
-						Observable.Range(random.Next(1, 5), random.Next(1, 25)), 
-						(t, r) => r
+						Observable.Range(random.Next(1, 5), random.Next(2, 7)), 
+						(t, r) => (long)r
 					)
-					.Do(val => System.Diagnostics.Debug.WriteLine("Next Value: {0}", val))
-					.Scan((previous, current) => previous * current * random.Next());
+					.Scan((previous, current) => previous * current * (long)(random.Next(1, 35)))
+					.Do(val => Device.BeginInvokeOnMainThread(() => calculationProgress.Text = string.Format("Next Value: {0}", val)));
 
-			button1ClickedObservable =
+			downloadClickedObservable =
 				Observable
-						.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x);
+					.FromEventPattern (x => download.Clicked += x, x => download.Clicked -= x);
 		}
 
 		protected override void SetupReactiveSubscriptions ()
 		{
-			button1ClickedObservable
+			downloadClickedObservable
 				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (async args => {
 					try {
-						button1.IsEnabled = false;
+						download.IsEnabled = false;
 						outputLabel.Text = "Starting Calculation";
 
 						var result = await calculationObservable;
@@ -70,7 +78,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						outputLabel.Text = string.Format("Calculation Complete: {0}", result);
 
 					} finally {
-						button1.IsEnabled = true;
+						download.IsEnabled = true;
 					}
 				})
 				.DisposeWith(SubscriptionDisposables);

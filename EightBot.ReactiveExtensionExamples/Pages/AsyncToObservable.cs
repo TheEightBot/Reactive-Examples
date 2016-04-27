@@ -28,7 +28,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			button1 = new Button{ Text = "Call Service" };
 
 			Content = new StackLayout { 
-				Padding = new Thickness(40d),
+				Padding = new Thickness(8d),
+				Spacing = 16d,
 				Children = {
 					button1, 
 					(outputLabel = new Label { HorizontalTextAlignment = TextAlignment.Center, Text = "" }),
@@ -57,8 +58,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 					try {
 						var result = 
-							await Observable
-								.FromAsync(() => PerformCalculation())
+							await Observable.FromAsync(() => PerformCalculation())
 								.Timeout(TimeSpan.FromMilliseconds(300))
 								.Retry(5)
 								.Catch<int, TimeoutException>(tex => Observable.Return(-1))
@@ -66,10 +66,10 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 						outputLabel.Text = 
 							result >= 0
-							? string.Format("Calculation Complete: {0}", result)
-							: result == -100
-							? "Listen, things went really bad." + Environment.NewLine + "Reconsider your life choices"
-							: "Bummer, it looks like your calculation failed";
+								? string.Format("Calculation Complete: {0}", result)
+								: result == -100
+									? "Listen, things went really bad." + Environment.NewLine + "Reconsider your life choices"
+									: "Bummer, it looks like your calculation failed";
 
 						if(result < 0)
 							outputLabel.TextColor = Color.Red;
@@ -83,7 +83,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 		//This is a faux web service
 		async Task<int> PerformCalculation (){
-			var random = new Random ();
+			var random = new Random (DateTime.Now.Millisecond);
 
 			var delayTime = random.Next (150, 500);
 

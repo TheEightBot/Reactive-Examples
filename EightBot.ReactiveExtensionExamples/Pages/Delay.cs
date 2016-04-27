@@ -22,7 +22,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			Title = "Rx - Delay";
 
 			Content = new StackLayout { 
-				Padding = new Thickness(40d),
+				Padding = new Thickness(8d),
+				Spacing = 16d,
 				Children = {
 					(textEntry = new Entry{ Placeholder = "Enter Some Text" }),
 					new ScrollView { 

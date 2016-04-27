@@ -8,6 +8,7 @@ using EightBot.ReactiveExtensionExamples.Utilities;
 using System.Threading.Tasks;
 using System.Reactive;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace EightBot.ReactiveExtensionExamples.Pages
 {
@@ -23,7 +24,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			Title = "Rx - Buffer";
 
 			Content = new StackLayout { 
-				Padding = new Thickness(40d),
+				Padding = new Thickness(8d),
+				Spacing = 16d,
 				Children = {
 					(textEntry = new Entry{ Placeholder = "Enter Some Text" }),
 					 new ScrollView { 

@@ -1,0 +1,157 @@
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Akavache;
+using EightBot.ReactiveExtensionExamples.Utilities;
+using ModernHttpClient;
+using ReactiveUI;
+using Xamarin.Forms;
+using System.Collections.Generic;
+
+namespace EightBot.ReactiveExtensionExamples.Pages
+{
+	public class Akavache : PageBase
+	{
+		Button download;
+		ListView rssFeed;
+
+		IObservable<EventPattern<object>> downloadClickedObservable;
+
+		IDisposable akavacheQuery;
+
+		protected override void SetupUserInterface ()
+		{
+			Title = "Rx - Akavache";
+
+			download = new Button{ Text = "Update RSS Feed" };
+
+			Content = new StackLayout { 
+				Children = {
+					download, 
+					(rssFeed = new ListView { 
+						ItemTemplate = new DataTemplate (typeof(RssEntryCell)),
+						HasUnevenRows = true
+					})
+				}
+			};
+		}
+
+		protected override void SetupReactiveObservables ()
+		{
+			downloadClickedObservable =
+				Observable
+					.FromEventPattern (x => download.Clicked += x, x => download.Clicked -= x);
+		}
+
+		protected override void SetupReactiveSubscriptions ()
+		{
+			downloadClickedObservable
+				.ObserveOn(RxApp.TaskpoolScheduler)
+				.Subscribe (args => {
+					Device.BeginInvokeOnMainThread(() => download.IsEnabled = false);
+
+					akavacheQuery?.Dispose();
+
+					akavacheQuery = 
+						BlobCache.InMemory
+							.GetAndFetchLatest (
+								"RssFeed",
+								() => DownloadRss (),
+								absoluteExpiration: DateTimeOffset.Now.AddSeconds (10d)
+							)
+							.ObserveOn (RxApp.MainThreadScheduler)
+							.Do (_ => System.Diagnostics.Debug.WriteLine ($"Received update at {DateTimeOffset.Now}"))
+							.Subscribe(
+								result => rssFeed.ItemsSource = result,
+								() => download.IsEnabled = true
+							);
+				})
+				.DisposeWith(SubscriptionDisposables);
+		}
+
+		async Task<List<RssEntry>> DownloadRss () {
+			System.Diagnostics.Debug.WriteLine ($"Starting download at {DateTimeOffset.Now}");
+			var client = new HttpClient(new NativeMessageHandler ());
+			var rssStream = await client.GetStringAsync("https://www.reddit.com/.rss").ConfigureAwait(false);
+
+			var parsedEntries =
+				await Task.Run (
+					() => {
+						XNamespace ns = "http://www.w3.org/2005/Atom";
+						var entries = 
+							XDocument
+								.Parse(rssStream)
+								.Root
+								.Descendants(ns + "entry");
+
+						var rssEntries = 
+							entries
+								.Select(entry =>
+									new RssEntry {
+										Author = entry?.Element(ns + "author")?.Element(ns + "name")?.Value ?? string.Empty,
+										Category = entry?.Element(ns + "category")?.Attribute(ns + "term")?.Value ?? string.Empty,
+										Content = entry?.Element(ns + "content")?.Value ?? string.Empty,
+										Updated = DateTimeOffset.Parse(entry?.Element(ns + "updated")?.Value),
+										Title = entry?.Element(ns + "title")?.Value ?? string.Empty,
+									}
+								)
+								.OrderByDescending(rssEntry => rssEntry.Updated)
+								.ToList ();
+
+						return rssEntries;
+					})
+					.ConfigureAwait(false);
+
+			return parsedEntries;
+		}
+
+		class RssEntry {
+			public string Author {
+				get;
+				set;
+			}
+
+			public string Category {
+				get;
+				set;
+			}
+
+			public string Content {
+				get;
+				set;
+			}
+
+			public DateTimeOffset Updated {
+				get;
+				set;
+			}
+
+			public string Title {
+				get;
+				set;
+			}
+		}
+
+		class RssEntryCell : ViewCell {
+			public RssEntryCell () {
+				var stackLayout = new StackLayout {};
+
+				var title = new Label {
+					FontAttributes = FontAttributes.Bold
+				};
+				title.SetBinding(Label.TextProperty, "Title");
+				stackLayout.Children.Add(title);
+
+				View = stackLayout;
+			}
+		}
+	}
+}
+
+

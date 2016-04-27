@@ -23,7 +23,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 			navListPage.SelectedNavigation
 				.ObserveOn (RxApp.MainThreadScheduler)
-				.StartWith(NavigationPages.Async)
+				.StartWith(NavigationPages.Delay)
 				.Subscribe (navPage => {
 
 					Page selectedPage = null;
@@ -53,13 +53,19 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 							selectedPage = new Pages.Sample();
 							break;
 						case NavigationPages.AsyncToObservable:
-							selectedPage = new Pages.AsyncToObservable();
+							selectedPage = new Pages.AsyncToObservable ();
+							break;
+						case NavigationPages.CombineLatest:
+							selectedPage = new Pages.CombineLatest ();
 							break;
 						case NavigationPages.RxUiColorSlider:
 							selectedPage = new Pages.ReactiveUiColorSlider();
 							break;
 						case NavigationPages.RxUiLogin:
 							selectedPage = new Pages.ReactiveUiLogin();
+							break;
+						case NavigationPages.Akavache:
+							selectedPage = new Pages.Akavache();
 							break;
 						default:
 						break;
@@ -87,8 +93,10 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			Merge,
 			Sample,
 			AsyncToObservable,
+			CombineLatest,
 			RxUiColorSlider,
-			RxUiLogin
+			RxUiLogin,
+			Akavache
 		}
 
 		class NavListPage : ContentPage {
@@ -98,23 +106,16 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			public NavListPage () {
 				Title = "Reactive Examples";
 
-				var navigationContainer = new StackLayout {
+				var scrollContainer = new ScrollView {
 					BackgroundColor = Color.FromHex("#dddddd"),
+				};
+
+				var navigationContainer = new StackLayout {
+					
 					Padding = new Thickness(8d),
 					Spacing = 8d
 				};
-
-				var async = new NavigationButton { 
-					Text = "Async",
-					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Async)),
-				};
-				navigationContainer.Children.Add(async);
-
-				var asyncEvents = new NavigationButton { 
-					Text = "Async Events",
-					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.AsyncEvents)),
-				};
-				navigationContainer.Children.Add(asyncEvents);
+				scrollContainer.Content = navigationContainer;
 
 				var delay = new NavigationButton { 
 					Text = "Delay",
@@ -158,6 +159,24 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				};
 				navigationContainer.Children.Add(asyncToObservable);
 
+				var async = new NavigationButton { 
+					Text = "Async",
+					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Async)),
+				};
+				navigationContainer.Children.Add(async);
+
+				var asyncEvents = new NavigationButton { 
+					Text = "Async Events",
+					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.AsyncEvents)),
+				};
+				navigationContainer.Children.Add(asyncEvents);
+
+				var combineLatest = new NavigationButton { 
+					Text = "Combine Latest",
+					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.CombineLatest)),
+				};
+				navigationContainer.Children.Add(combineLatest);
+
 				var rxuiColorSlider = new NavigationButton { 
 					Text = "RxUI - Color Slider",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.RxUiColorSlider)),
@@ -170,7 +189,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				};
 				navigationContainer.Children.Add(rxuiLogin);
 
-				Content = navigationContainer;
+				var akavache = new NavigationButton { 
+					Text = "Akavache",
+					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Akavache)),
+				};
+				navigationContainer.Children.Add(akavache);
+
+				Content = scrollContainer;
 			}
 		
 			internal class NavigationButton : Button {

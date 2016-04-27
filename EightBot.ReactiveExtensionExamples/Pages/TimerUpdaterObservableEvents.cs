@@ -28,7 +28,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			stop = new Button{ Text = "Stop" };
 
 			Content = new StackLayout { 
-				Padding = new Thickness(40d),
+				Padding = new Thickness(8d),
+				Spacing = 16d,
 				Children = {
 					start, 
 					stop,

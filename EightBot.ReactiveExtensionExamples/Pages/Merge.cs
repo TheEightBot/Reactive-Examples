@@ -31,7 +31,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			button4 = new Button{ Text = "Winston Zeddemore" };
 
 			Content = new StackLayout { 
-				Padding = new Thickness(40d),
+				Padding = new Thickness(8d),
+				Spacing = 16d,
 				Children = {
 					button1, 
 					button2,
