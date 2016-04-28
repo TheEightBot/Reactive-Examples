@@ -55,8 +55,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						x => red.ValueChanged += x, 
 						x => red.ValueChanged -= x
 					)				
-					.StartWith (new EventPattern<ValueChangedEventArgs> (null, new ValueChangedEventArgs (0, 0)))
-					.Select(result => (int)result.EventArgs.NewValue);		
+					.Select(result => (int)result.EventArgs.NewValue)
+					.StartWith(0);		
 
 			greenValueChangedObservable =
 				Observable
@@ -64,8 +64,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						x => green.ValueChanged += x, 
 						x => green.ValueChanged -= x
 					)
-					.StartWith (new EventPattern<ValueChangedEventArgs> (null, new ValueChangedEventArgs (0, 0)))
-					.Select(result => (int)result.EventArgs.NewValue);
+					.Select(result => (int)result.EventArgs.NewValue)
+					.StartWith(0);
 			
 			blueValueChangedObservable =
 				Observable
@@ -73,8 +73,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						x => blue.ValueChanged += x, 
 						x => blue.ValueChanged -= x
 					)
-					.StartWith(new EventPattern<ValueChangedEventArgs>(null, new ValueChangedEventArgs(0, 0)))
-					.Select(result => (int)result.EventArgs.NewValue);
+					.Select(result => (int)result.EventArgs.NewValue)
+					.StartWith(0);
 
 
 			colorObservable = 

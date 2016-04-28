@@ -153,6 +153,12 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				};
 				navigationContainer.Children.Add(merge);
 
+				var combineLatest = new NavigationButton { 
+					Text = "Combine Latest",
+					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.CombineLatest)),
+				};
+				navigationContainer.Children.Add(combineLatest);
+
 				var asyncToObservable = new NavigationButton { 
 					Text = "Mix Async With Observables",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.AsyncToObservable)),
@@ -170,12 +176,6 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.AsyncEvents)),
 				};
 				navigationContainer.Children.Add(asyncEvents);
-
-				var combineLatest = new NavigationButton { 
-					Text = "Combine Latest",
-					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.CombineLatest)),
-				};
-				navigationContainer.Children.Add(combineLatest);
 
 				var rxuiColorSlider = new NavigationButton { 
 					Text = "RxUI - Color Slider",
