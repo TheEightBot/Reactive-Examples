@@ -45,8 +45,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						x => textEntry.TextChanged += x, 
 						x => textEntry.TextChanged -= x
 					)
-					.Buffer (TimeSpan.FromSeconds (3))
-					.Where (argsList => argsList != null && argsList.Any ())
+					.Buffer (TimeSpan.FromSeconds (3), TaskPoolScheduler.Default)
+					.Where (argsList => argsList?.Any () ?? false)
 					.Select(argsList => 
 						string.Join(
 							Environment.NewLine, 

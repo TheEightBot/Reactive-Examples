@@ -56,7 +56,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 			intervalObservable =
 				Observable
-					.Interval (TimeSpan.FromSeconds (1))
+					.Interval (TimeSpan.FromSeconds (1), TaskPoolScheduler.Default)
 					.Select(timeInterval => string.Format ("Last Interval: {0}", timeInterval));
 		}
 

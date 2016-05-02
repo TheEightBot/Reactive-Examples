@@ -14,12 +14,6 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		Entry textEntry;
 		WebView webView;
 
-		IObservable<EventPattern<WebNavigatingEventArgs>>
-			webViewNavigatingObservable;
-
-		IObservable<EventPattern<WebNavigatedEventArgs>>
-			webViewNavigatedObservable;
-
 		IObservable<string>
 			textEntryObservable;
 
@@ -41,27 +35,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 		protected override void SetupReactiveObservables ()
 		{
-			webViewNavigatingObservable =
-				Observable
-					.FromEventPattern<EventHandler<WebNavigatingEventArgs>, WebNavigatingEventArgs> (
-						x => webView.Navigating += x, 
-						x => webView.Navigating -= x
-					);
-
-			webViewNavigatedObservable =
-				Observable
-					.FromEventPattern<EventHandler<WebNavigatedEventArgs>, WebNavigatedEventArgs> (
-						x => webView.Navigated += x, 
-						x => webView.Navigated -= x
-					);
-
 			textEntryObservable =
 				Observable
 					.FromEventPattern<EventHandler<TextChangedEventArgs>, TextChangedEventArgs> (
 						x => textEntry.TextChanged += x, 
 						x => textEntry.TextChanged -= x
 					)
-					.Sample (TimeSpan.FromSeconds (3))
+					.Sample (TimeSpan.FromSeconds (3), TaskPoolScheduler.Default)
 					.Select(args => 
 						string.Format("https://frinkiac.com/?q={0}", args.EventArgs.NewTextValue.Replace(" ", "+"))
 					);
@@ -69,14 +49,6 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 		protected override void SetupReactiveSubscriptions ()
 		{
-			webViewNavigatingObservable
-				.Subscribe (_ => Device.BeginInvokeOnMainThread(() => webView.FadeTo(0d)))
-				.DisposeWith(SubscriptionDisposables);
-
-			webViewNavigatedObservable
-				.Subscribe (_ => Device.BeginInvokeOnMainThread(() => webView.FadeTo(1d)))
-				.DisposeWith(SubscriptionDisposables);
-
 			textEntryObservable
 				.Subscribe (searchUrl => {
 					Device.BeginInvokeOnMainThread(() => {

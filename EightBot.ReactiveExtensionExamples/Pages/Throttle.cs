@@ -44,14 +44,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						x => textEntry.TextChanged += x, 
 						x => textEntry.TextChanged -= x
 					)
-					.Throttle (TimeSpan.FromSeconds (3))
+					.Throttle (TimeSpan.FromSeconds (3), TaskPoolScheduler.Default)
 					.Select(args => args.EventArgs.NewTextValue);
 		}
 
 		protected override void SetupReactiveSubscriptions ()
 		{
 			textEntryObservable
-				.ObserveOn (RxApp.MainThreadScheduler)
 				.Subscribe (text => {
 					Device.BeginInvokeOnMainThread(() => {
 						lastEntries.Children

@@ -58,7 +58,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						
 					try {
 						var result = 
-							await Observable.FromAsync(() => PerformCalculation())
+							await Observable
+								.FromAsync(() => PerformCalculation())
 								.Timeout(TimeSpan.FromMilliseconds(300))
 								.Retry(5)
 								.Catch<int, TimeoutException>(tex => Observable.Return(-1))

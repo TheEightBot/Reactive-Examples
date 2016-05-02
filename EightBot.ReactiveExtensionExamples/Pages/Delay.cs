@@ -71,8 +71,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 								2, 
 								new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
 					});
-				}
-				)
+				})
 				.DisposeWith(SubscriptionDisposables);
 		}
 	}
