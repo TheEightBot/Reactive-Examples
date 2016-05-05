@@ -31,9 +31,14 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					(emailEntry = new Entry{ Placeholder = "Email" }),
 					(passwordEntry = new Entry { Placeholder = "Password", IsPassword = true }),
 					(login = new Button{ Text = "Login" }),
-					(loading = new ActivityIndicator{ Color = Color.Blue, HorizontalOptions = LayoutOptions.Center }),
+					(loading = new ActivityIndicator{ HorizontalOptions = LayoutOptions.Center }),
 				}
 			};
+
+			emailEntry.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveEntry);
+			passwordEntry.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveEntry);
+			login.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveButton);
+			loading.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveActivityIndicator);
 		}
 
 		protected override void OnAppearing ()

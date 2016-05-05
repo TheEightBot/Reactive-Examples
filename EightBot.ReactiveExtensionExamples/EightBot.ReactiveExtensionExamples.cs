@@ -8,6 +8,7 @@ namespace EightBot.ReactiveExtensionExamples
 	{
 		public App ()
 		{
+			Values.Styles.Initialize ();
 			MainPage = new Pages.NavigationContainerPage ();
 		}
 

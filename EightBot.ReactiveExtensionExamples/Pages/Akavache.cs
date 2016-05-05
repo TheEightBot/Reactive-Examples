@@ -29,7 +29,10 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		{
 			Title = "Rx - Akavache";
 
-			download = new Button{ Text = "Update RSS Feed" };
+			download = new Button{ 
+				Text = "Update RSS Feed",
+			};
+			download.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			Content = new StackLayout { 
 				Children = {
@@ -95,7 +98,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 										Author = entry?.Element(ns + "author")?.Element(ns + "name")?.Value ?? string.Empty,
 										Category = entry?.Element(ns + "category")?.Attribute(ns + "term")?.Value ?? string.Empty,
 										Content = entry?.Element(ns + "content")?.Value ?? string.Empty,
-										Updated = DateTimeOffset.Parse(entry?.Element(ns + "updated")?.Value),
+										Updated = DateTimeOffset.Parse(entry?.Element(ns + "updated")?.Value).ToString(),
 										Title = entry?.Element(ns + "title")?.Value ?? string.Empty,
 									}
 								)
@@ -125,7 +128,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				set;
 			}
 
-			public DateTimeOffset Updated {
+			public string Updated {
 				get;
 				set;
 			}
@@ -141,10 +144,18 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				var stackLayout = new StackLayout {};
 
 				var title = new Label {
-					FontAttributes = FontAttributes.Bold
+					Margin = new Thickness (8d)
 				};
 				title.SetBinding(Label.TextProperty, "Title");
 				stackLayout.Children.Add(title);
+
+				var updated = new Label {
+					Margin = new Thickness (8d),
+					FontSize = Device.GetNamedSize(NamedSize.Small, typeof(Label)),
+					FontAttributes = FontAttributes.Italic
+				};
+				updated.SetBinding(Label.TextProperty, "Updated");
+				stackLayout.Children.Add(updated);
 
 				View = stackLayout;
 			}

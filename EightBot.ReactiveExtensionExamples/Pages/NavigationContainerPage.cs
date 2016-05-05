@@ -12,12 +12,12 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 		public NavigationContainerPage ()
 		{
-			Master = new NavigationPage(navListPage){
+			var primaryNavPage = new NavigationPage(navListPage){
 				Title = "Reactive Examples",
-				BarTextColor = Color.White,
-				BarBackgroundColor = Color.Gray,
-				Icon = "slideout.png"
 			};
+			primaryNavPage.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveNavigation);
+
+			Master = primaryNavPage;
 
 			this.MasterBehavior = MasterBehavior.Popover;
 
@@ -71,12 +71,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						break;
 					}
 
-					if(selectedPage != null)
-						Detail = 
-							new NavigationPage(selectedPage){
-								BarBackgroundColor = Color.Gray,
-								BarTextColor = Color.White,
-							};
+					if(selectedPage != null) {
+						var detailNavPage = new NavigationPage(selectedPage) {};
+
+						detailNavPage.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveNavigation);
+
+						Detail = detailNavPage;
+					}
 
 					this.IsPresented = false;
 				
@@ -111,100 +112,110 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				};
 
 				var navigationContainer = new StackLayout {
-					
-					Padding = new Thickness(8d),
 					Spacing = 24d
 				};
+
 				scrollContainer.Content = navigationContainer;
 
-				var delay = new NavigationButton { 
+				var delay = new Button { 
 					Text = "Delay",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Delay)),
 				};
+				delay.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(delay);
 
-				var throttle = new NavigationButton { 
+				var throttle = new Button { 
 					Text = "Throttle",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Throttle)),
 				};
+				throttle.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(throttle);
 
-				var buffer = new NavigationButton { 
+				var buffer = new Button { 
 					Text = "Buffer",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Buffer)),
 				};
+				buffer.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(buffer);
 
-				var bufferWithWhere = new NavigationButton { 
+				var bufferWithWhere = new Button { 
 					Text = "Buffer with Where",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.BufferWithWhere)),
 				};
+				bufferWithWhere.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(bufferWithWhere);
 
-				var sample = new NavigationButton { 
+				var sample = new Button { 
 					Text = "Sample",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Sample)),
 				};
+				sample.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(sample);
 
-				var merge = new NavigationButton { 
+				var merge = new Button { 
 					Text = "Merge",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Merge)),
 				};
+				merge.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(merge);
 
-				var combineLatest = new NavigationButton { 
+				var combineLatest = new Button { 
 					Text = "Combine Latest",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.CombineLatest)),
 				};
+				combineLatest.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(combineLatest);
 
-				var asyncToObservable = new NavigationButton { 
+				var asyncToObservable = new Button { 
 					Text = "Mix Async With Observables",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.AsyncToObservable)),
 				};
+				asyncToObservable.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(asyncToObservable);
 
-				var async = new NavigationButton { 
+				var reactiveAsync = new Button { 
 					Text = "Async",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Async)),
 				};
-				navigationContainer.Children.Add(async);
+				reactiveAsync.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
+				navigationContainer.Children.Add(reactiveAsync);
 
-				var asyncEvents = new NavigationButton { 
+				var asyncEvents = new Button { 
 					Text = "Async Events",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.AsyncEvents)),
 				};
+				asyncEvents.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(asyncEvents);
 
-				var rxuiColorSlider = new NavigationButton { 
+				var rxuiColorSlider = new Button { 
 					Text = "RxUI - Color Slider",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.RxUiColorSlider)),
 				};
+				rxuiColorSlider.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(rxuiColorSlider);
 
-				var rxuiLogin = new NavigationButton { 
+				var rxuiLogin = new Button { 
 					Text = "RxUI - Login",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.RxUiLogin)),
 				};
+				rxuiLogin.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(rxuiLogin);
 
-				var akavache = new NavigationButton { 
+				var akavache = new Button { 
 					Text = "Akavache",
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Akavache)),
 				};
+				akavache.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(akavache);
 
+				var reactiveLogo = new Image { 
+					Source = "reactive_logo.png",
+					Aspect = Aspect.AspectFit,
+					Margin = new Thickness(8d)
+				};
+				navigationContainer.Children.Add(reactiveLogo);
+
 				Content = scrollContainer;
-			}
-		
-			internal class NavigationButton : Button {
-
-				public NavigationButton () {
-					TextColor = Color.White;
-					BackgroundColor = Color.Gray;
-				}
-
 			}
 		}
 	}

@@ -25,12 +25,16 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			Title = "Rx - Merge";
 
 			button1 = new Button{ Text = "Peter Venkman" };
+			button1.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			button2 = new Button{ Text = "Ray Stantz" };
+			button2.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			button3 = new Button{ Text = "Egon Spengler" };
+			button3.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			button4 = new Button{ Text = "Winston Zeddemore" };
+			button4.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			Content = new StackLayout { 
 				Padding = new Thickness(8d),

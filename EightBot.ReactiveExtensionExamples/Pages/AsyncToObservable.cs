@@ -18,14 +18,17 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		Button button1;
 		ActivityIndicator loading;
 
-		IObservable<EventPattern<Object>>
-			button1ClickedObservable;
+		IObservable<EventPattern<Object>> button1ClickedObservable;
 
 		protected override void SetupUserInterface ()
 		{
 			Title = "Rx - Async to Observable";
 
 			button1 = new Button{ Text = "Call Service" };
+			button1.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
+
+			loading = new ActivityIndicator { };
+			loading.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveActivityIndicator);
 
 			Content = new StackLayout { 
 				Padding = new Thickness(8d),
@@ -33,7 +36,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				Children = {
 					button1, 
 					(outputLabel = new Label { HorizontalTextAlignment = TextAlignment.Center, Text = "" }),
-					(loading = new ActivityIndicator {})
+					loading
 				}
 			};
 		}

@@ -17,6 +17,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			myButton = new Button { 
 				Text = "This is a button"
 			};
+			myButton.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			myButton.Clicked += MyButton_Clicked;
 			buttonClickedInformation = new Label { };

@@ -25,6 +25,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			Title = "Rx - Async";
 
 			download = new Button{ Text = "Calculate" };
+			download.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			Content = new StackLayout { 
 				Padding = new Thickness(8d),
