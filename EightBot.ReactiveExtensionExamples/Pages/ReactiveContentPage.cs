@@ -12,7 +12,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 		}
 
 		public static readonly BindableProperty ViewModelProperty = 
-			BindableProperty.Create<ReactiveContentPage<TViewModel>, TViewModel>(x => x.ViewModel, null, BindingMode.OneWay);
+			BindableProperty.Create(nameof(ViewModels), typeof(TViewModel), typeof(ReactiveContentPage<TViewModel>), default(TViewModel), BindingMode.OneWay);
 
 		#region IViewFor implementation
 

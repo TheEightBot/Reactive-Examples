@@ -98,7 +98,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 										Author = entry?.Element(ns + "author")?.Element(ns + "name")?.Value ?? string.Empty,
 										Category = entry?.Element(ns + "category")?.Attribute(ns + "term")?.Value ?? string.Empty,
 										Content = entry?.Element(ns + "content")?.Value ?? string.Empty,
-										Updated = DateTimeOffset.Parse(entry?.Element(ns + "updated")?.Value).ToString(),
+										Updated = DateTimeOffset.Parse(entry?.Element(ns + "updated")?.Value).ToLocalTime().ToString("dd MMM yyyy hh:mm tts"),
 										Title = entry?.Element(ns + "title")?.Value ?? string.Empty,
 									}
 								)

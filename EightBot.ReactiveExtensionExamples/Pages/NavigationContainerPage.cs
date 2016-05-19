@@ -52,6 +52,9 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 						case NavigationPages.Sample:
 							selectedPage = new Pages.Sample();
 							break;
+						case NavigationPages.Scan:
+							selectedPage = new Pages.Scan();
+							break;
 						case NavigationPages.AsyncToObservable:
 							selectedPage = new Pages.AsyncToObservable ();
 							break;
@@ -93,6 +96,7 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			BufferWithWhere,
 			Merge,
 			Sample,
+			Scan,
 			AsyncToObservable,
 			CombineLatest,
 			RxUiColorSlider,
@@ -151,6 +155,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 				};
 				sample.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 				navigationContainer.Children.Add(sample);
+
+				var scan = new Button { 
+					Text = "Scan",
+					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Scan)),
+				};
+				scan.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
+				navigationContainer.Children.Add(scan);
 
 				var merge = new Button { 
 					Text = "Merge",
