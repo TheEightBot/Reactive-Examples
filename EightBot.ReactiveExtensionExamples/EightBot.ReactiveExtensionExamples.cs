@@ -1,5 +1,6 @@
 ﻿using System;
-
+using Refit;
+using Splat;
 using Xamarin.Forms;
 
 namespace EightBot.ReactiveExtensionExamples
@@ -14,6 +15,9 @@ namespace EightBot.ReactiveExtensionExamples
 
 		protected override void OnStart ()
 		{
+			Locator.CurrentMutable.RegisterLazySingleton(
+				() => RestService.For<Services.Api.IDuckDuckGoApi>("https://api.duckduckgo.com"), 
+				typeof(Services.Api.IDuckDuckGoApi));
 		}
 
 		protected override void OnSleep ()
