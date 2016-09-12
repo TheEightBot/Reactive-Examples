@@ -25,10 +25,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			Title = "Rx - Async to Observable";
 
 			button1 = new Button{ Text = "Call Service" };
-			button1.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			loading = new ActivityIndicator { };
-			loading.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveActivityIndicator);
 
 			Content = new StackLayout { 
 				Padding = new Thickness(8d),

@@ -28,10 +28,8 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			Title = "Rx - Async Events";
 
 			button1 = new Button{ Text = "Calculate" };
-			button1.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			button2 = new Button{ Text = "STOP" };
-			button2.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			Content = new StackLayout { 
 				Padding = new Thickness(8d),

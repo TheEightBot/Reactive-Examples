@@ -34,11 +34,6 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					(loading = new ActivityIndicator{ HorizontalOptions = LayoutOptions.Center }),
 				}
 			};
-
-			emailEntry.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveEntry);
-			passwordEntry.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveEntry);
-			login.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveButton);
-			loading.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveActivityIndicator);
 		}
 
 		protected override void OnAppearing ()
@@ -47,11 +42,13 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 
 			this.Bind (ViewModel, vm => vm.EmailAddress, c => c.emailEntry.Text)
 				.DisposeWith(subscriptionDisposables);
+			
 			this.Bind (ViewModel, vm => vm.Password, c => c.passwordEntry.Text)
 				.DisposeWith(subscriptionDisposables);
 
 			this.OneWayBind (ViewModel, vm => vm.IsLoading, c => c.loading.IsRunning)
 				.DisposeWith(subscriptionDisposables);
+			
 			this.OneWayBind (ViewModel, vm => vm.IsLoading, c => c.loading.IsVisible)
 				.DisposeWith(subscriptionDisposables);
 

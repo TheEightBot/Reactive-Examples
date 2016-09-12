@@ -16,17 +16,14 @@ namespace EightBot.ReactiveExtensionExamples.Values
 			Indigo = Color.FromHex("#4C108C"),
 			MediumVioletRed = Color.FromHex("#B7178C");
 
-		static Styles () {
-		}
-
 		public static void Initialize (){
 			if(Application.Current.Resources == null)
 				Application.Current.Resources = new ResourceDictionary ();
 
-			Application.Current.Resources [ReactiveNavigation] = CreateReactiveNavigationStyle ();
-			Application.Current.Resources [ReactiveButton] = CreateReactiveButtonStyle ();
-			Application.Current.Resources [ReactiveEntry] = CreateReactiveEntryStyle ();
-			Application.Current.Resources [ReactiveActivityIndicator] = CreateReactiveActivityIndicatorStyle ();
+			Application.Current.Resources.Add(CreateReactiveNavigationStyle ());
+			Application.Current.Resources.Add( CreateReactiveButtonStyle ());
+			Application.Current.Resources.Add(CreateReactiveEntryStyle ());
+			Application.Current.Resources.Add(CreateReactiveActivityIndicatorStyle ());
 		}
 
 		static Style CreateReactiveNavigationStyle (){

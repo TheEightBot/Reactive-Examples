@@ -35,8 +35,6 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 					}
 				}
 			};
-
-			textEntry.SetDynamicResource (VisualElement.StyleProperty, Values.Styles.ReactiveEntry);
 		}
 
 		protected override void SetupReactiveObservables ()

@@ -32,7 +32,6 @@ namespace EightBot.ReactiveExtensionExamples.Pages
 			download = new Button{ 
 				Text = "Update RSS Feed",
 			};
-			download.SetDynamicResource(VisualElement.StyleProperty, Values.Styles.ReactiveButton);
 
 			Content = new StackLayout { 
 				Children = {
