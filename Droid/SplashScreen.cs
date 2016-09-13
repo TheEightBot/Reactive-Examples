@@ -12,7 +12,7 @@ using Android.Views;
 using Android.Widget;
 using System.Threading.Tasks;
 
-namespace EightBot.ReactiveExtensionExamples.Droid
+namespace ReactiveExtensionExamples.Droid
 {
 	[Activity (		
 		Label = "Rx Examples", 

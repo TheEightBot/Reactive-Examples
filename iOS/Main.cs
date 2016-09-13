@@ -5,7 +5,7 @@ using System.Linq;
 using Foundation;
 using UIKit;
 
-namespace EightBot.ReactiveExtensionExamples.iOS
+namespace ReactiveExtensionExamples.iOS
 {
 	public class Application
 	{

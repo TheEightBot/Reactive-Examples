@@ -3,7 +3,7 @@ using UIKit;
 using Foundation;
 using System.Reactive.Disposables;
 
-namespace EightBot.ReactiveExtensionExamples.iOS
+namespace ReactiveExtensionExamples.iOS
 {
 	public class DisposalViewController : UIViewController
 	{
