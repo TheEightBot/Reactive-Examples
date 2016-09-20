@@ -26,18 +26,18 @@ namespace ReactiveExtensionExamples.ViewModels
 			set { this.RaiseAndSetIfChanged(ref _searchQuery, value); }
 		}
 
-		ReactiveCommand<List<SearchResult>> _search;
-		public ReactiveCommand<List<SearchResult>> Search
-		{
-			get { return _search; }
-			private set { this.RaiseAndSetIfChanged(ref _search, value); }
-		}
-
 		ObservableCollection<SearchResult> _searchResults;
 		public ObservableCollection<SearchResult> SearchResults
 		{
 			get { return _searchResults; }
 			private set { this.RaiseAndSetIfChanged(ref _searchResults, value); }
+		}
+
+		ReactiveCommand<List<SearchResult>> _search;
+		public ReactiveCommand<List<SearchResult>> Search
+		{
+			get { return _search; }
+			private set { this.RaiseAndSetIfChanged(ref _search, value); }
 		}
 
 		public SearchViewModel()
@@ -49,7 +49,7 @@ namespace ReactiveExtensionExamples.ViewModels
             // that the CanExecute will auto-disable and that property IsExecuting will
             // be set according whilst it is running.
 			Search = ReactiveCommand.CreateAsyncTask(
-				
+
 				// Here we're describing here, in a *declarative way*, the conditions in
 				// which the Search command is enabled.  Now our Command IsEnabled is
 				// perfectly efficient, because we're only updating the UI in the scenario
@@ -101,7 +101,8 @@ namespace ReactiveExtensionExamples.ViewModels
             // ThrownExceptions is any exception thrown from the CreateFromObservable piped
             // to this Observable. Subscribing to this allows you to handle errors on
             // the UI thread.
-            Search.ThrownExceptions
+            Search
+				.ThrownExceptions
 				.Subscribe(async ex => {
 				    var result = await UserError.Throw("Potential Network Connectivity Error", ex);
 
@@ -109,6 +110,7 @@ namespace ReactiveExtensionExamples.ViewModels
 						Search.Execute(null);
 				});
 
+			//Behaviors
 			this.WhenAnyValue(x => x.SearchQuery)
 				.Throttle(TimeSpan.FromSeconds(.75), TaskPoolScheduler.Default)
 			    .Do(x => System.Diagnostics.Debug.WriteLine($"Throttle fired for {x}"))
