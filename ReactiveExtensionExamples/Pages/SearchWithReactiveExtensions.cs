@@ -57,7 +57,7 @@ namespace ReactiveExtensionExamples.Pages
 					.Select(x => x.EventArgs.NewTextValue)
 					//Reactive Extensions has many ways to further refine our flow of data
 					//Here, we are going to throttle the data, this means that only the last value will be sent after a delay
-					.Throttle(TimeSpan.FromSeconds(.5), TaskPoolScheduler.Default);
+					.Throttle(TimeSpan.FromSeconds(.75), TaskPoolScheduler.Default);
 
 
 			var buttonClickedObservable =
