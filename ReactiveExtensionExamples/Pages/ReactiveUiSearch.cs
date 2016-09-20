@@ -15,6 +15,7 @@ namespace ReactiveExtensionExamples.Pages
 		Entry textEntry;
 		Button search;
 		ListView searchResults;
+		ActivityIndicator _loading;
 
 		readonly CompositeDisposable bindingsDisposable = new CompositeDisposable();
 
@@ -29,6 +30,7 @@ namespace ReactiveExtensionExamples.Pages
 				Children = {
 					(textEntry = new Entry{ Placeholder = "Enter Search Terms" }),
 					(search = new Button{ Text = "Search", IsEnabled = false }),
+					(_loading = new ActivityIndicator{}),
 					(searchResults = new ListView {
 						VerticalOptions = LayoutOptions.FillAndExpand,
 						HorizontalOptions = LayoutOptions.FillAndExpand,
@@ -55,6 +57,10 @@ namespace ReactiveExtensionExamples.Pages
 			//This is a command binding
 			this.BindCommand(ViewModel, x => x.Search, c => c.search)
 				.DisposeWith(bindingsDisposable);
+
+			this.WhenAnyObservable(x => x.ViewModel.Search.IsExecuting)
+			    .BindTo(_loading, c => c.IsRunning)
+			    .DisposeWith(bindingsDisposable);
 
 			//TODO: RxSUI - Item 2 - User error allows us to interact with our users and get feedback on how to handle an exception
 			UserError
