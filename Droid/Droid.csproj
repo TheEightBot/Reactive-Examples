@@ -150,12 +150,10 @@
     <Folder Include="Resources\mipmap-xhdpi\" />
     <Folder Include="Resources\mipmap-xxhdpi\" />
     <Folder Include="Resources\mipmap-xxxhdpi\" />
+    <Folder Include="Resources\drawable-xhdpi\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\icon.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\icon.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\icon.png" />
     <AndroidResource Include="Resources\drawable-hdpi\slideout.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\slideout.png" />
     <AndroidResource Include="Resources\drawable\reactive_logo.png" />
