@@ -1,16 +1,13 @@
 ﻿using System;
-
-using Xamarin.Forms;
-using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
-using System.Reactive.Disposables;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class TimerUpdaterObservableEvents : PageBase
+    public class TimerUpdaterObservableEvents : PageBase
 	{
 		Label timerLabel;
 		Button start, stop;

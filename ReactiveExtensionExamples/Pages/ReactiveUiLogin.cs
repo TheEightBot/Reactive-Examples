@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Linq;
-using Xamarin.Forms;
-using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using ReactiveUI;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class ReactiveUiLogin : ReactiveContentPage<ViewModels.Login>
+    public class ReactiveUiLogin : ReactiveContentPage<ViewModels.Login>
 	{
 		readonly CompositeDisposable subscriptionDisposables = new CompositeDisposable ();
 

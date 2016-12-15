@@ -25,7 +25,7 @@ namespace ReactiveExtensionExamples.ViewModels
 		ObservableAsPropertyHelper<bool> _isLoading;
 
 		public bool IsLoading {
-			get { return _isLoading.Value; }
+			get { return _isLoading?.Value ?? false; }
 		}
 
 		ObservableAsPropertyHelper<bool> _isValid;
@@ -33,7 +33,7 @@ namespace ReactiveExtensionExamples.ViewModels
 			get { return _isValid?.Value ?? false; }
 		}
 
-		public ReactiveCommand<Unit> PerformLogin;
+		public ReactiveCommand<object, Unit> PerformLogin;
 
 		public Login ()
 		{
@@ -59,16 +59,17 @@ namespace ReactiveExtensionExamples.ViewModels
 					(isLoading, IsValid) => !isLoading && IsValid)
 				    .Do(x => System.Diagnostics.Debug.WriteLine($"Can Login: {x}"));
 			
-			PerformLogin = ReactiveCommand.CreateAsyncTask<Unit> (
-				canExecuteLogin,
+			PerformLogin = ReactiveCommand.CreateFromTask<object, Unit> (
 				async _ => {
 					var random = new Random(Guid.NewGuid().GetHashCode());
 					await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
 
 					return Unit.Default;
-				});
+				},
+                canExecuteLogin);
 
-			this.WhenAnyObservable(x => x.PerformLogin.IsExecuting)
+            this.WhenAnyObservable(x => x.PerformLogin.IsExecuting)
+                .StartWith(false)
 				.ToProperty (this, x => x.IsLoading, out _isLoading);
 		}
 	}

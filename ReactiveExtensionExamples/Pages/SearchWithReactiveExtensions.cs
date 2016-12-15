@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Linq;
-using Xamarin.Forms;
-using System.Reactive.Linq;
 using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
-using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Splat;
 using ReactiveExtensionExamples.Services.Api;
+using Splat;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class SearchWithReactiveExtensions : ContentPage
+    public class SearchWithReactiveExtensions : ContentPage
 	{
 		Entry textEntry;
 		Button search;
@@ -116,9 +113,10 @@ namespace ReactiveExtensionExamples.Pages
 
 				Device.BeginInvokeOnMainThread(() => searchResults.ItemsSource = formattedSearchResults);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				await this.DisplayAlert("Exception", "There was a failure performing a search", "OK");
+                Device.BeginInvokeOnMainThread(async () =>
+                    await this.DisplayAlert("Exception", "There was a failure performing a search", "OK"));
 			}
 			finally
 			{

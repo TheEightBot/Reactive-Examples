@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Linq;
-using Xamarin.Forms;
-using System.Reactive.Linq;
 using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class BufferWithWhere : PageBase
+    public class BufferWithWhere : PageBase
 	{
 		Entry textEntry;
 		StackLayout lastEntries;

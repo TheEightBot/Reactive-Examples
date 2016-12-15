@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Linq;
-using Xamarin.Forms;
-using System.Reactive.Linq;
 using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
-using System.Threading.Tasks;
-using System.Reactive;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class Buffer : PageBase
+    public class Buffer : PageBase
 	{
 		Entry textEntry;
 		StackLayout lastEntries;
@@ -43,9 +38,8 @@ namespace ReactiveExtensionExamples.Pages
 			textEntryObservable =
 				Observable
 					.FromEventPattern<EventHandler<TextChangedEventArgs>, TextChangedEventArgs> (
-					x => textEntry.TextChanged += x, 
-					x => textEntry.TextChanged -= x
-				)
+						x => textEntry.TextChanged += x, 
+						x => textEntry.TextChanged -= x)
 				.Buffer (TimeSpan.FromSeconds (3), TaskPoolScheduler.Default)
 				.Select(argsList => 
 					string.Join(

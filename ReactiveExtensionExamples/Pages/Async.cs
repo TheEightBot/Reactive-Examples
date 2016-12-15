@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
-using ReactiveExtensionExamples.Utilities;
-using ReactiveUI;
 using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class Async : PageBase
+    public class Async : PageBase
 	{
 		Label outputLabel, calculationProgress;
 		Button download;

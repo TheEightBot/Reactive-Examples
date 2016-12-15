@@ -1,11 +1,8 @@
 ﻿using System;
-
 using Xamarin.Forms;
 using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
 using System.Reactive;
+using System.Reactive.Disposables;
 
 namespace ReactiveExtensionExamples.Pages
 {
@@ -55,13 +52,29 @@ namespace ReactiveExtensionExamples.Pages
 
 		protected override void SetupReactiveObservables ()
 		{
-			button1ClickedObservable = Observable.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x);
+			button1ClickedObservable = 
+				Observable
+					.FromEventPattern (
+						x => button1.Clicked += x, 
+						x => button1.Clicked -= x);
 
-			button2ClickedObservable = Observable.FromEventPattern (x => button2.Clicked += x, x => button2.Clicked -= x);
+			button2ClickedObservable = 
+				Observable
+					.FromEventPattern (
+						x => button2.Clicked += x, 
+						x => button2.Clicked -= x);
 
-			button3ClickedObservable = Observable.FromEventPattern (x => button3.Clicked += x, x => button3.Clicked -= x);
+			button3ClickedObservable = 
+				Observable
+					.FromEventPattern (
+						x => button3.Clicked += x, 
+						x => button3.Clicked -= x);
 
-			button4ClickedObservable = Observable.FromEventPattern (x => button4.Clicked += x, x => button4.Clicked -= x);
+			button4ClickedObservable = 
+				Observable
+					.FromEventPattern (
+						x => button4.Clicked += x, 
+						x => button4.Clicked -= x);
 		
 			allButtonsObservable = 
 				button1ClickedObservable
@@ -70,8 +83,7 @@ namespace ReactiveExtensionExamples.Pages
 					.Merge (button4ClickedObservable)
 					.Select (args => 
 						string.Format ("Who merged the Streams?{0}{1}", 
-							Environment.NewLine, ((Button)args.Sender).Text)
-					);
+							Environment.NewLine, ((Button)args.Sender).Text));
 		}
 
 		protected override void SetupReactiveSubscriptions ()

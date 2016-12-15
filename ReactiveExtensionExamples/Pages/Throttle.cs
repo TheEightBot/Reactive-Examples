@@ -1,16 +1,12 @@
 ﻿using System;
-
-using Xamarin.Forms;
-using System.Reactive.Linq;
 using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
-using System.Reactive;
-using System.Collections.Generic;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class Throttle : PageBase
+    public class Throttle : PageBase
 	{
 		Entry textEntry;
 		StackLayout lastEntries;

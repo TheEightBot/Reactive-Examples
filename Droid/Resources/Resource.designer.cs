@@ -27,7 +27,6 @@ namespace EightBot.ReactiveExtensionExamples.Droid
 		public static void UpdateIdValues()
 		{
 			global::Splat.Resource.String.library_name = global::EightBot.ReactiveExtensionExamples.Droid.Resource.String.library_name;
-			global::ModernHttpClient.Resource.String.library_name = global::EightBot.ReactiveExtensionExamples.Droid.Resource.String.library_name;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::EightBot.ReactiveExtensionExamples.Droid.Resource.Attribute.actionBarSize;
 		}
 		

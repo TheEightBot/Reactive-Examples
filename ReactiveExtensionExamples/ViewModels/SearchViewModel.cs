@@ -33,12 +33,14 @@ namespace ReactiveExtensionExamples.ViewModels
 			private set { this.RaiseAndSetIfChanged(ref _searchResults, value); }
 		}
 
-		ReactiveCommand<List<SearchResult>> _search;
-		public ReactiveCommand<List<SearchResult>> Search
+		ReactiveCommand<string, List<SearchResult>> _search;
+		public ReactiveCommand<string, List<SearchResult>> Search
 		{
 			get { return _search; }
 			private set { this.RaiseAndSetIfChanged(ref _search, value); }
 		}
+
+        public Interaction<string, Unit> SearchError { get; private set; } = new Interaction<string, Unit>();
 
 		public SearchViewModel()
         {
@@ -48,30 +50,22 @@ namespace ReactiveExtensionExamples.ViewModels
             // guarantees that this block will only run exactly once at a time, and
             // that the CanExecute will auto-disable and that property IsExecuting will
             // be set according whilst it is running.
-			Search = ReactiveCommand.CreateAsyncTask(
+			Search = ReactiveCommand.CreateFromTask<string, List<SearchResult>>(
 
 				// Here we're describing here, in a *declarative way*, the conditions in
 				// which the Search command is enabled.  Now our Command IsEnabled is
 				// perfectly efficient, because we're only updating the UI in the scenario
 				// when it should change.
-				Observable
-					.CombineLatest(
-						this.WhenAnyValue(vm => vm.SearchQuery).Select(searchQuery => !string.IsNullOrEmpty(searchQuery)).DistinctUntilChanged(),
-						this.WhenAnyObservable(x => x.Search.IsExecuting).DistinctUntilChanged(),
-						(hasSearchQuery, isExecuting) => hasSearchQuery && !isExecuting)
-					.Do(cps => System.Diagnostics.Debug.WriteLine($"Can Perform Search: {cps}"))
-					.DistinctUntilChanged(),
-
-				async _ => {
+				async searchQuery => {
 					var random = new Random(Guid.NewGuid().GetHashCode());
 					await Task.Delay(random.Next(250, 2500));
 
 					//This is just here so simulate a network type exception
 					if (DateTime.Now.Second % 3 == 0)
-						throw new TimeoutException("Unable to connec to web service");
+						throw new TimeoutException("Unable to connect to web service");
 
 					var searchService = Locator.CurrentMutable.GetService<IDuckDuckGoApi>();
-					var searchResult = await searchService.Search(SearchQuery);
+					var searchResult = await searchService.Search(searchQuery);
 
 					return searchResult
 						.RelatedTopics
@@ -82,7 +76,14 @@ namespace ReactiveExtensionExamples.ViewModels
 								ImageUrl = rt?.Icon?.Url ?? string.Empty
 							})
 						.ToList();
-				});
+				},
+                Observable
+                    .CombineLatest(
+                        this.WhenAnyValue(vm => vm.SearchQuery).Select(searchQuery => !string.IsNullOrEmpty(searchQuery)).DistinctUntilChanged(),
+                        this.WhenAnyObservable(x => x.Search.IsExecuting).DistinctUntilChanged(),
+                        (hasSearchQuery, isExecuting) => hasSearchQuery && !isExecuting)
+                    .Do(cps => System.Diagnostics.Debug.WriteLine($"Can Perform Search: {cps}"))
+                    .DistinctUntilChanged());
 
 			//// ReactiveCommands are themselves IObservables, whose value are the results
 			//// from the async method, guaranteed to arrive on the given scheduler.
@@ -101,14 +102,11 @@ namespace ReactiveExtensionExamples.ViewModels
             // ThrownExceptions is any exception thrown from the CreateFromObservable piped
             // to this Observable. Subscribing to this allows you to handle errors on
             // the UI thread.
-            Search
-				.ThrownExceptions
-				.Subscribe(async ex => {
-				    var result = await UserError.Throw("Potential Network Connectivity Error", ex);
-
-					if (result == RecoveryOptionResult.RetryOperation && Search.CanExecute(null))
-						Search.Execute(null);
-				});
+            Search.ThrownExceptions
+                .Subscribe(async ex =>
+                {
+                    await SearchError.Handle("Potential Network Connectivity Error");
+                });
 
 			//Behaviors
 			this.WhenAnyValue(x => x.SearchQuery)

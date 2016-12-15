@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Xamarin.Forms;
-using System.Reactive.Linq;
 using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
-using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
@@ -50,15 +48,9 @@ namespace ReactiveExtensionExamples.Pages
 		protected override void SetupReactiveSubscriptions ()
 		{
 			textEntryObservable
-				.Subscribe (searchUrl => {
-					Device.BeginInvokeOnMainThread(() => {
-						try {
-							webView.Source = searchUrl;
-						} catch {
-							webView.Source = "https://frinkiac.com/caption/S04E05/1135500";
-						}
-					});
-				})
+				.Subscribe (
+					searchUrl => Device.BeginInvokeOnMainThread(() => webView.Source = searchUrl),
+               		ex => Device.BeginInvokeOnMainThread(() => webView.Source = "https://frinkiac.com/caption/S04E05/1135500"))
 				.DisposeWith(SubscriptionDisposables);
 		}
 	}
