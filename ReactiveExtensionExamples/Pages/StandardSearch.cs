@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Linq;
-using Xamarin.Forms;
 using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
-using System.Reactive;
-using System.Reactive.Disposables;
-using System.Threading.Tasks;
-using Splat;
-using ReactiveExtensionExamples.Services.Api;
 using System.Threading;
+using System.Threading.Tasks;
+using ReactiveExtensionExamples.Services.Api;
+using Splat;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class StandardSearch : ContentPage
+    public class StandardSearch : ContentPage
 	{
 		Entry textEntry;
 		Button search;

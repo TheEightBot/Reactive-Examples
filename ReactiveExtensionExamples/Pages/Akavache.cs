@@ -1,22 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Akavache;
-using ReactiveExtensionExamples.Utilities;
-using ModernHttpClient;
-using ReactiveUI;
 using Xamarin.Forms;
-using System.Collections.Generic;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class Akavache : PageBase
+    public class Akavache : PageBase
 	{
 		Button download;
 		ListView rssFeed;
@@ -24,6 +20,8 @@ namespace ReactiveExtensionExamples.Pages
 		IObservable<EventPattern<object>> downloadClickedObservable;
 
 		IDisposable akavacheQuery;
+
+        readonly HttpClient client = new HttpClient();
 
 		protected override void SetupUserInterface ()
 		{
@@ -77,7 +75,7 @@ namespace ReactiveExtensionExamples.Pages
 
 		async Task<List<RssEntry>> DownloadRss () {
 			System.Diagnostics.Debug.WriteLine ($"Starting download at {DateTimeOffset.Now}");
-			var client = new HttpClient(new NativeMessageHandler ());
+			
 			var rssStream = await client.GetStringAsync("https://www.reddit.com/.rss").ConfigureAwait(false);
 
 			var parsedEntries =

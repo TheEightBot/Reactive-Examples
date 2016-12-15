@@ -1,18 +1,13 @@
 ﻿using System;
-
-using Xamarin.Forms;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
-using System.Threading.Tasks;
-using System.Reactive.Disposables;
 using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class AsyncToObservable : PageBase
+    public class AsyncToObservable : PageBase
 	{
 		Label outputLabel;
 		Button button1;
@@ -60,7 +55,7 @@ namespace ReactiveExtensionExamples.Pages
 					try {
 						var result = 
 							await Observable
-								.FromAsync(() => PerformCalculation())
+								.FromAsync(() => PerformCalculationAsync())
 								.Timeout(TimeSpan.FromMilliseconds(300))
 								.Retry(5)
 								.Catch<int, TimeoutException>(tex => Observable.Return(-1))
@@ -86,7 +81,7 @@ namespace ReactiveExtensionExamples.Pages
 
 
 		//Imagine this is a faux web service or similar
-		async Task<int> PerformCalculation (){
+		async Task<int> PerformCalculationAsync (){
 			var random = new Random (DateTime.Now.Millisecond);
 
 			var delayTime = random.Next (150, 500);

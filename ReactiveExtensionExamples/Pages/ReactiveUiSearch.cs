@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Linq;
-using Xamarin.Forms;
-using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using ReactiveUI;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class ReactiveUiSearch : ReactiveContentPage<ViewModels.SearchViewModel>
+    public class ReactiveUiSearch : ReactiveContentPage<ViewModels.SearchViewModel>
 	{
 		Entry textEntry;
 		Button search;
@@ -63,12 +60,18 @@ namespace ReactiveExtensionExamples.Pages
 			    .DisposeWith(bindingsDisposable);
 
 			//TODO: RxSUI - Item 2 - User error allows us to interact with our users and get feedback on how to handle an exception
-			UserError
-				.RegisterHandler(async (UserError arg) => {
-					var result = await this.DisplayAlert("Search Failed", $"{arg.ErrorMessage}{Environment.NewLine}Retry search?", "Yes", "No");
-					return result ? RecoveryOptionResult.RetryOperation : RecoveryOptionResult.CancelOperation;
-				})
-         		.DisposeWith(bindingsDisposable);
+			this.WhenAnyValue(x => x.ViewModel)
+                .Where(x => x != null)
+                .Subscribe(vm =>
+                {
+                    vm.SearchError
+                        .RegisterHandler(interaction =>
+                        {
+                            Device.BeginInvokeOnMainThread(async () => await this.DisplayAlert("Error", interaction.Input, "OK"));
+                            interaction.SetOutput(Unit.Default);
+                        });
+                })
+                .DisposeWith(bindingsDisposable);
 		}
 
 		protected override void OnDisappearing()

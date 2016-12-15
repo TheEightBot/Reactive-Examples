@@ -1,16 +1,11 @@
 ﻿using System;
-
-using Xamarin.Forms;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using ReactiveUI;
-using ReactiveExtensionExamples.Utilities;
-using System.Collections.Generic;
-using System.Reactive;
+using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class Delay : PageBase
+    public class Delay : PageBase
 	{
 		Entry textEntry;
 		StackLayout lastEntries;

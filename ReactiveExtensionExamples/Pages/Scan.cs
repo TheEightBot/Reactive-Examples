@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using ReactiveExtensionExamples.Utilities;
-using ModernHttpClient;
 using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
-	public class Scan : PageBase
+    public class Scan : PageBase
 	{
 		Button download;
 		ListView rssFeed;
@@ -19,6 +18,8 @@ namespace ReactiveExtensionExamples.Pages
 		IObservable<List<RssEntry>> itemsObservable;
 
 		IDisposable akavacheQuery;
+
+        readonly HttpClient client = new HttpClient();
 
 		protected override void SetupUserInterface ()
 		{
@@ -91,7 +92,7 @@ namespace ReactiveExtensionExamples.Pages
 
 		async Task<List<RssEntry>> DownloadRss (string url) {
 			System.Diagnostics.Debug.WriteLine ($"Starting download at {DateTimeOffset.Now}");
-			var client = new HttpClient(new NativeMessageHandler ());
+
 			var rssStream = await client.GetStringAsync(url).ConfigureAwait(false);
 
 			var parsedEntries =
