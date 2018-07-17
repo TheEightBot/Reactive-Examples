@@ -13,6 +13,7 @@ namespace ReactiveExtensionExamples.Pages
 	{
 		Entry textEntry;
 		ListView searchResults;
+        Button search;
 		ActivityIndicator _loading;
         SerialDisposable _searchErrorDisposable;
         
@@ -26,6 +27,7 @@ namespace ReactiveExtensionExamples.Pages
 				Padding = new Thickness(8d),
 				Children = {
 					(textEntry = new Entry{ Placeholder = "Enter Search Terms" }),
+                    (search = new Button{ Text = "Search" }),
 					(_loading = new ActivityIndicator{}),
 					(searchResults = new ListView(ListViewCachingStrategy.RecycleElement) {
 						VerticalOptions = LayoutOptions.FillAndExpand,
@@ -43,6 +45,9 @@ namespace ReactiveExtensionExamples.Pages
                 //TODO: RxSUI - Item 1 - Here we are just setting up bindings to our UI Elements
                 //This is a two-way bind
                 this.Bind(ViewModel, x => x.SearchQuery, c => c.textEntry.Text)
+                    .DisposeWith(disposables);
+                    
+                this.BindCommand(ViewModel, x => x.Search, c => c.search, this.WhenAnyValue(x => x.ViewModel.SearchQuery))
                     .DisposeWith(disposables);
     
                 //This is a one-way bind
