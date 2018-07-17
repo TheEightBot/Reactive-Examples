@@ -59,7 +59,6 @@ namespace ReactiveExtensionExamples.Pages
                         //Start Calculating
                         calculationSubscription = 
                             calculationObservable
-                                .ObserveOn(RxApp.MainThreadScheduler)
                                 .Subscribe(val => 
                                     Device.BeginInvokeOnMainThread(() => 
                                         outputLabel.Text = string.Format("Calculation Value: {0}", val)
