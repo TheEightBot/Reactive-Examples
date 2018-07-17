@@ -3,19 +3,19 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveUI;
+using ReactiveUI.XamForms;
 using Xamarin.Forms;
+using System.Runtime.InteropServices;
 
 namespace ReactiveExtensionExamples.Pages
 {
     public class ReactiveUiSearch : ReactiveContentPage<ViewModels.SearchViewModel>
 	{
 		Entry textEntry;
-		Button search;
 		ListView searchResults;
 		ActivityIndicator _loading;
-
-		readonly CompositeDisposable bindingsDisposable = new CompositeDisposable();
-
+        SerialDisposable _searchErrorDisposable;
+        
 		public ReactiveUiSearch() {
 			Title = "Rx - Search";
 
@@ -26,64 +26,55 @@ namespace ReactiveExtensionExamples.Pages
 				Padding = new Thickness(8d),
 				Children = {
 					(textEntry = new Entry{ Placeholder = "Enter Search Terms" }),
-					(search = new Button{ Text = "Search", IsEnabled = false }),
 					(_loading = new ActivityIndicator{}),
-					(searchResults = new ListView {
+					(searchResults = new ListView(ListViewCachingStrategy.RecycleElement) {
 						VerticalOptions = LayoutOptions.FillAndExpand,
 						HorizontalOptions = LayoutOptions.FillAndExpand,
-						HasUnevenRows = true,
 						ItemTemplate = new DataTemplate(typeof(DuckDuckGoResultCell))
 					})
 				}
 			};
+
+            this.WhenActivated((CompositeDisposable disposables) =>
+            {
+                _searchErrorDisposable?.Dispose();
+                _searchErrorDisposable = new SerialDisposable();
+            
+                //TODO: RxSUI - Item 1 - Here we are just setting up bindings to our UI Elements
+                //This is a two-way bind
+                this.Bind(ViewModel, x => x.SearchQuery, c => c.textEntry.Text)
+                    .DisposeWith(disposables);
+    
+                //This is a one-way bind
+                this.OneWayBind(ViewModel, x => x.SearchResults, c => c.searchResults.ItemsSource)
+                    .DisposeWith(disposables);
+    
+                //TODO: RxSUI - Item 2 - User error allows us to interact with our users and get feedback on how to handle an exception
+                this.WhenAnyValue(x => x.ViewModel.SearchError)
+                    .Where(x => x != null)
+                    .Subscribe(searchError =>
+                    {
+                        _searchErrorDisposable.Disposable =
+                            searchError
+                                .RegisterHandler(async interaction =>
+                                {
+                                    await this.DisplayAlert("Error", interaction.Input, "OK");
+                                    interaction.SetOutput(Unit.Default);
+                                });
+                    })
+                    .DisposeWith(disposables);
+                    
+                _searchErrorDisposable
+                    .DisposeWith(disposables);
+            });
 		}
 
-		protected override void OnAppearing()
+		class DuckDuckGoResultCell : ReactiveViewCell<ViewModels.SearchResult>
 		{
-			base.OnAppearing();
+            Image icon;
 
-			//TODO: RxSUI - Item 1 - Here we are just setting up bindings to our UI Elements
-			//This is a two-way bind
-			this.Bind(ViewModel, x => x.SearchQuery, c => c.textEntry.Text)
-				.DisposeWith(bindingsDisposable);
-
-			//This is a one-way bind
-			this.OneWayBind(ViewModel, x => x.SearchResults, c => c.searchResults.ItemsSource)
-				.DisposeWith(bindingsDisposable);
-
-			//This is a command binding
-			this.BindCommand(ViewModel, x => x.Search, c => c.search)
-				.DisposeWith(bindingsDisposable);
-
-			this.WhenAnyObservable(x => x.ViewModel.Search.IsExecuting)
-			    .BindTo(_loading, c => c.IsRunning)
-			    .DisposeWith(bindingsDisposable);
-
-			//TODO: RxSUI - Item 2 - User error allows us to interact with our users and get feedback on how to handle an exception
-			this.WhenAnyValue(x => x.ViewModel)
-                .Where(x => x != null)
-                .Subscribe(vm =>
-                {
-                    vm.SearchError
-                        .RegisterHandler(interaction =>
-                        {
-                            Device.BeginInvokeOnMainThread(async () => await this.DisplayAlert("Error", interaction.Input, "OK"));
-                            interaction.SetOutput(Unit.Default);
-                        });
-                })
-                .DisposeWith(bindingsDisposable);
-		}
-
-		protected override void OnDisappearing()
-		{
-			base.OnDisappearing();
-
-			//TODO: RxSUI - Item 3 - We disposae of all of our bindings and any other subscriptions
-			bindingsDisposable.Clear();
-		}
-
-		class DuckDuckGoResultCell : ViewCell
-		{
+            Label displayText;
+        
 			public DuckDuckGoResultCell()
 			{
 				var grid = new Grid
@@ -95,23 +86,32 @@ namespace ReactiveExtensionExamples.Pages
 					}
 				};
 
-				var icon = new Image
+				icon = new Image
 				{
 					VerticalOptions = LayoutOptions.FillAndExpand,
 					Aspect = Aspect.AspectFit
 				};
-				icon.SetBinding(Image.SourceProperty, "ImageUrl");
 				grid.Children.Add(icon, 0, 0);
 
-				var displayText = new Label
+				displayText = new Label
 				{
 					HorizontalOptions = LayoutOptions.FillAndExpand,
 					VerticalOptions = LayoutOptions.FillAndExpand
 				};
-				displayText.SetBinding(Label.TextProperty, "DisplayText");
 				grid.Children.Add(displayText, 1, 0);
 
 				View = grid;
+
+                this.WhenActivated((CompositeDisposable disposables) =>
+                {
+                    this.WhenAnyValue(x => x.ViewModel.ImageUrl)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(x => icon.Source = x)
+                        .DisposeWith(disposables);
+                        
+                    this.OneWayBind(ViewModel, x => x.DisplayText, x => x.displayText.Text)
+                        .DisposeWith(disposables);
+                });
 			}
 		}
 	}

@@ -11,19 +11,15 @@ namespace ReactiveExtensionExamples.Pages
 		public PageBase ()
 		{
 			SetupUserInterface ();
-
-			SetupReactiveObservables ();
 		}
 
 		protected virtual void SetupUserInterface () {}
 
-		protected virtual void SetupReactiveObservables () {}
-
-		protected virtual void SetupReactiveSubscriptions () {}
+		protected virtual void SetupReactiveExtensions () {}
 
 		protected override void OnAppearing ()
 		{
-			SetupReactiveSubscriptions ();
+			SetupReactiveExtensions ();
 
 			base.OnAppearing ();
 		}

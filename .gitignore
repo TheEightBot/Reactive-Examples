@@ -150,3 +150,7 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+
+\.vs/
+
+Droid/Resources/Resource\.designer\.cs

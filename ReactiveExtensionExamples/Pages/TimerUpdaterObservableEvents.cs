@@ -12,11 +12,6 @@ namespace ReactiveExtensionExamples.Pages
 		Label timerLabel;
 		Button start, stop;
 
-		IObservable<EventPattern<object>> 
-			startClickedObservable, stopClickedObservable;
-
-		IObservable<string> intervalObservable;
-
 		IDisposable timerSubscription;
 
 		protected override void SetupUserInterface ()
@@ -35,45 +30,34 @@ namespace ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveObservables ()
+		protected override void SetupReactiveExtensions ()
 		{
-			startClickedObservable = 
-				Observable
-					.FromEventPattern (
-						x => start.Clicked += x, 
-						x => start.Clicked -= x
-					);
+            var intervalObservable =
+                Observable
+                    .Interval (TimeSpan.FromSeconds (1), TaskPoolScheduler.Default)
+                    .Select(timeInterval => string.Format ("Last Interval: {0}", timeInterval));
+                    
+			Observable
+				.FromEventPattern (
+					x => start.Clicked += x, 
+					x => start.Clicked -= x)
+                .Subscribe (args => {
+                    timerSubscription?.Dispose ();
 
-			stopClickedObservable = 
-				Observable
-					.FromEventPattern (
-						x => stop.Clicked += x, 
-						x => stop.Clicked -= x
-					);
+                    timerSubscription =
+                        intervalObservable
+                            .Subscribe (timeInterval => 
+                                Device.BeginInvokeOnMainThread(() => timerLabel.Text = timeInterval)
+                            );
+                })
+                .DisposeWith (SubscriptionDisposables);
 
-			intervalObservable =
-				Observable
-					.Interval (TimeSpan.FromSeconds (1), TaskPoolScheduler.Default)
-					.Select(timeInterval => string.Format ("Last Interval: {0}", timeInterval));
-		}
-
-		protected override void SetupReactiveSubscriptions ()
-		{
-			startClickedObservable
-				.Subscribe (args => {
-					timerSubscription?.Dispose ();
-
-					timerSubscription =
-						intervalObservable
-							.Subscribe (timeInterval => 
-								Device.BeginInvokeOnMainThread(() => timerLabel.Text = timeInterval)
-							);
-				})
-				.DisposeWith (SubscriptionDisposables);
-
-			stopClickedObservable
-				.Subscribe (args => timerSubscription?.Dispose ())
-				.DisposeWith (SubscriptionDisposables);
+			Observable
+				.FromEventPattern (
+					x => stop.Clicked += x, 
+					x => stop.Clicked -= x)
+                .Subscribe (args => timerSubscription?.Dispose ())
+                .DisposeWith (SubscriptionDisposables);
 		}
 
 		protected override void OnDisappearing ()

@@ -109,7 +109,7 @@ namespace ReactiveExtensionExamples.Pages
 				var formattedSearchResults =
 					searchResult.RelatedTopics
 						.Select(rt =>
-							new ViewModels.SearchViewModel.SearchResult
+							new ViewModels.SearchResult
 							{
 								DisplayText = rt.Text,
 								ImageUrl = rt?.Icon?.Url ?? string.Empty

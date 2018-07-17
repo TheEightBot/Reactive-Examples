@@ -3,6 +3,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveUI;
 using Xamarin.Forms;
+using System.Threading.Tasks;
+using ReactiveUI.XamForms;
 
 namespace ReactiveExtensionExamples.Pages
 {
@@ -35,34 +37,24 @@ namespace ReactiveExtensionExamples.Pages
 					(blue = new Slider(0, 255, 0))
 				}
 			};
-		}
 
-		protected override void OnAppearing ()
-		{
-			base.OnAppearing ();
+            this.WhenActivated((CompositeDisposable disposables) =>
+            {
+                this.Bind (ViewModel, vm => vm.Red, c => c.red.Value)
+                    .DisposeWith(disposables);
 
-			this.Bind (ViewModel, vm => vm.Red, c => c.red.Value)
-				.DisposeWith(subscriptionDisposables);
-
-			this.Bind (ViewModel, vm => vm.Green, c => c.green.Value)
-				.DisposeWith(subscriptionDisposables);
-
-			this.Bind (ViewModel, vm => vm.Blue, c => c.blue.Value)
-				.DisposeWith(subscriptionDisposables);
-
-			this.WhenAnyValue (x => x.ViewModel.Color)
-				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (color => {
-					colorDisplay.BackgroundColor = Color.FromRgba (color.R, color.G, color.B, color.A);
-				})
-				.DisposeWith(subscriptionDisposables);
-		}
-
-		protected override void OnDisappearing ()
-		{
-			base.OnDisappearing ();
-
-			subscriptionDisposables.Clear ();
+                this.Bind (ViewModel, vm => vm.Green, c => c.green.Value)
+                    .DisposeWith(disposables);
+    
+                this.Bind (ViewModel, vm => vm.Blue, c => c.blue.Value)
+                    .DisposeWith(disposables);
+    
+                this.WhenAnyValue (x => x.ViewModel.Color)
+                    .ObserveOn (RxApp.MainThreadScheduler)
+                    .Select (color => Color.FromRgba (color.R, color.G, color.B, color.A))
+                    .BindTo (this, x => x.colorDisplay.BackgroundColor)
+                    .DisposeWith(disposables);
+            });
 		}
 	}
 }

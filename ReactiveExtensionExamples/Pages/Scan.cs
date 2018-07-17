@@ -14,9 +14,7 @@ namespace ReactiveExtensionExamples.Pages
 	{
 		Button download;
 		ListView rssFeed;
-
-		IObservable<List<RssEntry>> itemsObservable;
-
+        
 		IDisposable akavacheQuery;
 
         readonly HttpClient client = new HttpClient();
@@ -36,39 +34,33 @@ namespace ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveObservables ()
+		protected override void SetupReactiveExtensions ()
 		{
-			itemsObservable = 
-				Observable.Interval(TimeSpan.FromSeconds(10))
-					.StartWith(0L)
-					.SelectMany(async _ => await DownloadMultipleRss())
-					.Scan(new List<RssEntry>(), 
-						(accumulatedItems, newItems) => {
-							var itemsToAdd = 
-								newItems
-									.Where(x => !accumulatedItems.Any(ai => ai.Id.Equals(x.Id)))
-									.Select(x => { x.New = true; return x;})
-									.ToList();
+			Observable.Interval(TimeSpan.FromSeconds(10))
+				.StartWith(0L)
+				.SelectMany(async _ => await DownloadMultipleRss())
+				.Scan(new List<RssEntry>(), 
+					(accumulatedItems, newItems) => {
+						var itemsToAdd = 
+							newItems
+								.Where(x => !accumulatedItems.Any(ai => ai.Id.Equals(x.Id)))
+								.Select(x => { x.New = true; return x;})
+								.ToList();
 
-							foreach (var item in accumulatedItems)
-								item.New = false;
-							
-							accumulatedItems.InsertRange(0, itemsToAdd);
+						foreach (var item in accumulatedItems)
+							item.New = false;
+						
+						accumulatedItems.InsertRange(0, itemsToAdd);
 
-							return
-								accumulatedItems
-									.OrderByDescending(x => x.New)
-									.ThenByDescending(x => x.Updated)
-									.Take(250)
-									.ToList(); 
-						});
-		}
-
-		protected override void SetupReactiveSubscriptions ()
-		{
-			itemsObservable
-				.Subscribe(result => Device.BeginInvokeOnMainThread(() => rssFeed.ItemsSource = result))
-				.DisposeWith(SubscriptionDisposables);
+						return
+							accumulatedItems
+								.OrderByDescending(x => x.New)
+								.ThenByDescending(x => x.Updated)
+								.Take(250)
+								.ToList(); 
+					})
+                .Subscribe(result => Device.BeginInvokeOnMainThread(() => rssFeed.ItemsSource = result))
+                .DisposeWith(SubscriptionDisposables);
 		}
 
 		async Task<List<RssEntry>> DownloadMultipleRss(){

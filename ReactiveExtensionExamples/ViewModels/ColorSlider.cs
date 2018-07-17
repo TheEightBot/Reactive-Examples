@@ -3,41 +3,46 @@ using System.Linq;
 using ReactiveUI;
 using System.Text.RegularExpressions;
 using System.Drawing;
+using System.Reactive.Disposables;
 
 namespace ReactiveExtensionExamples.ViewModels
 {
-	public class ColorSlider : ReactiveObject
+	public class ColorSlider : ViewModelBase
 	{
 		int _red;
-		public int Red {
-			get { return _red; }
-			set { this.RaiseAndSetIfChanged (ref _red, value); }
-		}
+		public int Red
+        {
+            get => _red;
+            set => this.RaiseAndSetIfChanged(ref _red, value);
+        }
 
-		int _green;
+        int _green;
 		public int Green {
-			get { return _green; }
-			set { this.RaiseAndSetIfChanged(ref _green, value); }
-		}
+            get => _green;
+            set => this.RaiseAndSetIfChanged(ref _green, value);
+        }
 
-		int _blue;
+        int _blue;
 		public int Blue {
-			get { return _blue; }
-			set { this.RaiseAndSetIfChanged(ref _blue, value); }
+			get => _blue;
+			set => this.RaiseAndSetIfChanged(ref _blue, value);
 		}
 			
 		ObservableAsPropertyHelper<Color> _color;
-		public Color Color {
-			get { return _color.Value; }
-		}
+		public Color Color  => _color?.Value ?? default(Color);
 
 		public ColorSlider ()
 		{
-			this.WhenAnyValue (
-				x => x.Red, x => x.Green, x => x.Blue,
-				(red, green, blue) => Color.FromArgb(255, red, green, blue)
-			)
-			.ToProperty(this, v => v.Color, out _color);
+            this.WhenActivated(
+                (CompositeDisposable disposables) =>
+                {
+                    this
+                        .WhenAnyValue(
+                            x => x.Red, x => x.Green, x => x.Blue,
+                            (red, green, blue) => Color.FromArgb(255, red, green, blue))
+                        .ToProperty(this, x => x.Color, out _color)
+                        .DisposeWith(disposables);
+                });
 		}
 	}
 }

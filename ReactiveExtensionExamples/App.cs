@@ -15,9 +15,11 @@ namespace ReactiveExtensionExamples
 
 		protected override void OnStart ()
 		{
-			Locator.CurrentMutable.RegisterLazySingleton(
-				() => RestService.For<Services.Api.IDuckDuckGoApi>("https://api.duckduckgo.com"), 
-				typeof(Services.Api.IDuckDuckGoApi));
+			Locator
+                .CurrentMutable
+                .RegisterLazySingleton(
+    				() => RestService.For<Services.Api.IDuckDuckGoApi>("https://api.duckduckgo.com"), 
+    				typeof(Services.Api.IDuckDuckGoApi));
 		}
 
 		protected override void OnSleep ()

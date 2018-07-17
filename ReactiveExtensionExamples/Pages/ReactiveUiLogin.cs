@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveUI;
+using ReactiveUI.XamForms;
 using Xamarin.Forms;
 
 namespace ReactiveExtensionExamples.Pages
 {
     public class ReactiveUiLogin : ReactiveContentPage<ViewModels.Login>
 	{
-		readonly CompositeDisposable subscriptionDisposables = new CompositeDisposable ();
-
 		Entry emailEntry, passwordEntry;
 
 		Button login;
@@ -31,38 +31,34 @@ namespace ReactiveExtensionExamples.Pages
 					(loading = new ActivityIndicator{ HorizontalOptions = LayoutOptions.Center }),
 				}
 			};
-		}
 
-		protected override void OnAppearing ()
-		{
-			base.OnAppearing ();
-
-			this.Bind (ViewModel, vm => vm.EmailAddress, c => c.emailEntry.Text)
-				.DisposeWith(subscriptionDisposables);
-			
-			this.Bind (ViewModel, vm => vm.Password, c => c.passwordEntry.Text)
-				.DisposeWith(subscriptionDisposables);
-
-			this.OneWayBind (ViewModel, vm => vm.IsLoading, c => c.loading.IsRunning)
-				.DisposeWith(subscriptionDisposables);
-			
-			this.OneWayBind (ViewModel, vm => vm.IsLoading, c => c.loading.IsVisible)
-				.DisposeWith(subscriptionDisposables);
-
-			this.BindCommand (ViewModel, vm => vm.PerformLogin, c => c.login)
-				.DisposeWith(subscriptionDisposables);
-
-			this.WhenAnyObservable (x => x.ViewModel.PerformLogin)
-				.ObserveOn (RxApp.MainThreadScheduler)
-				.Subscribe (async _ => await DisplayAlert ("Log In", "It's Log, It's Log", "It's Big, It's Heavy, It's Wood"))
-				.DisposeWith(subscriptionDisposables);
-		}
-
-		protected override void OnDisappearing ()
-		{
-			base.OnDisappearing ();
-
-			subscriptionDisposables.Clear ();
+            this.WhenActivated((CompositeDisposable disposables) =>
+            {
+                this.Bind (ViewModel, vm => vm.EmailAddress, c => c.emailEntry.Text)
+                    .DisposeWith(disposables);
+                
+                this.Bind (ViewModel, vm => vm.Password, c => c.passwordEntry.Text)
+                    .DisposeWith(disposables);
+    
+                this.OneWayBind (ViewModel, vm => vm.IsLoading, c => c.loading.IsRunning)
+                    .DisposeWith(disposables);
+                
+                this.OneWayBind (ViewModel, vm => vm.IsLoading, c => c.loading.IsVisible)
+                    .DisposeWith(disposables);
+    
+                this.BindCommand (ViewModel, vm => vm.PerformLogin, c => c.login)
+                    .DisposeWith(disposables);
+    
+                this.WhenAnyObservable (x => x.ViewModel.PerformLogin)
+                    .ObserveOn (RxApp.MainThreadScheduler)
+                    .SelectMany (async _ => 
+                    { 
+                        await DisplayAlert("Log In", "It's Log, It's Log", "It's Big, It's Heavy, It's Wood"); 
+                        return Unit.Default; 
+                    })
+                    .Subscribe()
+                    .DisposeWith(disposables);            
+            });
 		}
 	}
 }

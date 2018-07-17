@@ -13,8 +13,6 @@ namespace ReactiveExtensionExamples.Pages
 		Button button1;
 		ActivityIndicator loading;
 
-		IObservable<EventPattern<Object>> button1ClickedObservable;
-
 		protected override void SetupUserInterface ()
 		{
 			Title = "Rx - Async to Observable";
@@ -34,51 +32,44 @@ namespace ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveObservables ()
+		protected override void SetupReactiveExtensions ()
 		{
-			button1ClickedObservable =
-				Observable
-					.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x);
+			Observable
+				.FromEventPattern (x => button1.Clicked += x, x => button1.Clicked -= x)
+                .Subscribe (async args => {
+
+                    Device.BeginInvokeOnMainThread(() => {
+                        outputLabel.TextColor = Color.Black;
+                        outputLabel.Text = "Starting Calculation";
+                        loading.IsRunning = true;
+                    });
+                        
+                    try {
+                        var result = 
+                            await Observable
+                                .FromAsync(() => PerformCalculationAsync())
+                                .Timeout(TimeSpan.FromMilliseconds(300))
+                                .Retry(5)
+                                .Catch<int, TimeoutException>(tex => Observable.Return(-1))
+                                .Catch<int, Exception>(ex => Observable.Return(-100));
+
+                        Device.BeginInvokeOnMainThread(() => {
+                            outputLabel.Text = 
+                                result >= 0
+                                    ? string.Format("Calculation Complete: {0}", result)
+                                    : result == -100
+                                        ? "Listen, things went really bad." + Environment.NewLine + "Reconsider your life choices"
+                                        : "Bummer, it looks like your calculation failed";
+
+                            if(result < 0)
+                                outputLabel.TextColor = Color.Red;
+                        });
+                    } finally {
+                        Device.BeginInvokeOnMainThread(() => loading.IsRunning = false);
+                    }
+                })
+                .DisposeWith(SubscriptionDisposables);
 		}
-
-		protected override void SetupReactiveSubscriptions ()
-		{
-			button1ClickedObservable
-				.Subscribe (async args => {
-
-					Device.BeginInvokeOnMainThread(() => {
-						outputLabel.TextColor = Color.Black;
-						outputLabel.Text = "Starting Calculation";
-						loading.IsRunning = true;
-					});
-						
-					try {
-						var result = 
-							await Observable
-								.FromAsync(() => PerformCalculationAsync())
-								.Timeout(TimeSpan.FromMilliseconds(300))
-								.Retry(5)
-								.Catch<int, TimeoutException>(tex => Observable.Return(-1))
-								.Catch<int, Exception>(ex => Observable.Return(-100));
-
-						Device.BeginInvokeOnMainThread(() => {
-							outputLabel.Text = 
-								result >= 0
-									? string.Format("Calculation Complete: {0}", result)
-									: result == -100
-										? "Listen, things went really bad." + Environment.NewLine + "Reconsider your life choices"
-										: "Bummer, it looks like your calculation failed";
-
-							if(result < 0)
-								outputLabel.TextColor = Color.Red;
-						});
-					} finally {
-						Device.BeginInvokeOnMainThread(() => loading.IsRunning = false);
-					}
-				})
-				.DisposeWith(SubscriptionDisposables);
-		}
-
 
 		//Imagine this is a faux web service or similar
 		async Task<int> PerformCalculationAsync (){

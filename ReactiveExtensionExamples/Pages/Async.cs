@@ -11,11 +11,6 @@ namespace ReactiveExtensionExamples.Pages
 		Label outputLabel, calculationProgress;
 		Button download;
 
-		IObservable<EventPattern<Object>>
-			downloadClickedObservable;
-
-		IObservable<long> calculationObservable;
-
 		protected override void SetupUserInterface ()
 		{
 			Title = "Rx - Async";
@@ -40,11 +35,11 @@ namespace ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveObservables ()
+		protected override void SetupReactiveExtensions ()
 		{
 			var random = new Random(DateTime.Now.Millisecond);
 
-			calculationObservable = 
+			var calculationObservable = 
 				Observable
 					.Interval(TimeSpan.FromMilliseconds(random.Next(100, 300)))
 					.Zip(
@@ -54,14 +49,8 @@ namespace ReactiveExtensionExamples.Pages
 					.Scan((previous, current) => previous * current * (long)(random.Next(1, 35)))
 					.Do(val => Device.BeginInvokeOnMainThread(() => calculationProgress.Text = string.Format("Next Value: {0}", val)));
 
-			downloadClickedObservable =
-				Observable
-					.FromEventPattern (x => download.Clicked += x, x => download.Clicked -= x);
-		}
-
-		protected override void SetupReactiveSubscriptions ()
-		{
-			downloadClickedObservable
+			Observable
+				.FromEventPattern (x => download.Clicked += x, x => download.Clicked -= x)
 				.Subscribe (async args => {
 					try {
 						Device.BeginInvokeOnMainThread(() => {

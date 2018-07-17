@@ -21,7 +21,8 @@ namespace ReactiveExtensionExamples.Pages
 			this.MasterBehavior = MasterBehavior.Popover;
 			this.IsPresented = true;
 
-			navListPage.SelectedNavigation
+			navListPage
+                .SelectedNavigation
 				.ObserveOn (RxApp.MainThreadScheduler)
 				.StartWith(NavigationPages.Delay)
 				.Subscribe (navPage => {
@@ -76,9 +77,6 @@ namespace ReactiveExtensionExamples.Pages
 						case NavigationPages.RxUiLogin:
 							selectedPage = new Pages.ReactiveUiLogin();
 							break;
-						case NavigationPages.Akavache:
-							selectedPage = new Pages.Akavache();
-							break;
 						default:
 						break;
 					}
@@ -110,8 +108,7 @@ namespace ReactiveExtensionExamples.Pages
 			RxUiLogin,
 			StandardSearch,
 			SearchWithReactiveExtensions,
-			RxUiSearch,
-			Akavache
+			RxUiSearch
 		}
 
 		class NavListPage : ContentPage {
@@ -229,12 +226,6 @@ namespace ReactiveExtensionExamples.Pages
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.RxUiLogin)),
 				};
 				navigationContainer.Children.Add(rxuiLogin);
-
-				var akavache = new Button { 
-					Text = "Akavache",
-					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.Akavache)),
-				};
-				navigationContainer.Children.Add(akavache);
 
 				var reactiveLogo = new Image { 
 					Source = "reactive_logo.png",

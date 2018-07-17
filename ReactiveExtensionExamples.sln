@@ -1,6 +1,7 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveExtensionExamples", "ReactiveExtensionExamples\ReactiveExtensionExamples.csproj", "{B54BEC10-F397-45B0-B080-E8E0292B2667}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iOS", "iOS\iOS.csproj", "{ECB1239A-8DAD-4E69-A4D2-D879D46491F7}"

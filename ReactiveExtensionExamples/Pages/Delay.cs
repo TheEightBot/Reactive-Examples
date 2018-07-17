@@ -10,8 +10,6 @@ namespace ReactiveExtensionExamples.Pages
 		Entry textEntry;
 		StackLayout lastEntries;
 
-		IObservable<string> textEntryObservable;
-
 		protected override void SetupUserInterface ()
 		{
 			Title = "Rx - Delay";
@@ -31,43 +29,39 @@ namespace ReactiveExtensionExamples.Pages
 			};
 		}
 
-		protected override void SetupReactiveObservables ()
+		protected override void SetupReactiveExtensions ()
 		{
-			textEntryObservable = 
-				Observable
-					.FromEventPattern<EventHandler<TextChangedEventArgs>, TextChangedEventArgs> (
-						x => textEntry.TextChanged += x, 
-						x => textEntry.TextChanged -= x
-					)
-					.Delay (TimeSpan.FromSeconds (3))
-					.Select(args => args.EventArgs.NewTextValue);
-		}
+			Observable
+				.FromEventPattern<EventHandler<TextChangedEventArgs>, TextChangedEventArgs> (
+					x => textEntry.TextChanged += x, 
+					x => textEntry.TextChanged -= x)
+                //MTS : The PM said 3 seconds was a great delay
+                .Delay (TimeSpan.FromSeconds (3))
 
-		protected override void SetupReactiveSubscriptions ()
-		{
-			textEntryObservable
-				.Subscribe (text => {
-					Device.BeginInvokeOnMainThread(() => {
-						lastEntries.Children
-							.Insert(
-								0, 
-								new Label { Text = text });
-						lastEntries.Children
-							.Insert(
-								1, 
-								new Label { 
-									Text = string.Format("Received at {0:H:mm:ss}", DateTime.Now), 
-									FontAttributes = FontAttributes.Italic, 
-									FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
-									TextColor = Color.Gray
-								});
-						lastEntries.Children
-							.Insert(
-								2, 
-								new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
-					});
-				})
-				.DisposeWith(SubscriptionDisposables);
+				.Select(args => args.EventArgs.NewTextValue)
+                .Subscribe(text => {
+                    Device.BeginInvokeOnMainThread(() => {
+                        lastEntries.Children
+                            .Insert(
+                                0,
+                                new Label { Text = text });
+                        lastEntries.Children
+                            .Insert(
+                                1,
+                                new Label
+                                {
+                                    Text = string.Format("Received at {0:H:mm:ss}", DateTime.Now),
+                                    FontAttributes = FontAttributes.Italic,
+                                    FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
+                                    TextColor = Color.Gray
+                                });
+                        lastEntries.Children
+                            .Insert(
+                                2,
+                                new BoxView { BackgroundColor = Color.Gray, HeightRequest = 2d });
+                    });
+                })
+                .DisposeWith(SubscriptionDisposables);
 		}
 	}
 }
