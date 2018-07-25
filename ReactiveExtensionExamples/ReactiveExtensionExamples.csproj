@@ -8,6 +8,7 @@
     <PackageReference Include="ReactiveUI" Version="8.3.1" />
     <PackageReference Include="ReactiveUI.XamForms" Version="8.3.1" />
     <PackageReference Include="Refit" Version="4.6.16" />
+    <PackageReference Include="Xamarin.Essentials" Version="0.8.0-preview" />
   </ItemGroup>
 
   <ItemGroup>
