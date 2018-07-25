@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using ReactiveExtensionExamples.Services.Api;
 using Splat;
 using Xamarin.Forms;
+using ReactiveUI;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace ReactiveExtensionExamples.Pages
 {
@@ -42,9 +45,8 @@ namespace ReactiveExtensionExamples.Pages
 		{
 			base.OnAppearing();
 
-			//TODO: SWRE - Item 2 - We are going to subscribe to events
-			var textChangedObservable =
 
+			var textChangedObservable =
 				Observable
 					//We can convert events into observables. Here is an example of how to do it for text changing on an entry
 					.FromEventPattern<TextChangedEventArgs>(
@@ -67,16 +69,56 @@ namespace ReactiveExtensionExamples.Pages
 					//Here, we tell it to use the value from the text entry
 					.Select(_ => textEntry.Text);
 
-			//TODO: SWRE - Item 3 - Subscribe to our observables and make sure we can clean them up
-			//We are going to add our subscription to the composite disposable
-			eventSubscriptions.Add (
+            eventSubscriptions.Add(
 
-				Observable
-					//We can merge two or more streams into a single one, this way we can process consistently
-					.Merge(textChangedObservable, buttonClickedObservable)
-					//This creates the subscription and provides a way to gather our data
-					.Subscribe(async searchText => await DoSearch(searchText))
-			
+                Observable
+                    //We can merge two or more streams into a single one, this way we can process consistently
+                    .Merge(textChangedObservable, buttonClickedObservable)
+                    .Where(searchText => !string.IsNullOrWhiteSpace(searchText))
+                    .Select(searchText =>
+                        Observable
+                            .FromAsync(
+                                async cancellationToken =>
+                                {
+                                    var searchService = Locator.CurrentMutable.GetService<IDuckDuckGoApi>();
+                                    var searchResult = await searchService.Search(searchText, cancellationToken).ConfigureAwait(false);
+                                    
+                                    var formattedSearchResults =
+                                        searchResult.RelatedTopics
+                                            .Select(
+                                                rt =>
+                                                    new ViewModels.SearchResult
+                                                    {
+                                                        DisplayText = rt.Text,
+                                                        ImageUrl = rt?.Icon?.Url ?? string.Empty
+                                                    });
+
+                                    if (cancellationToken.IsCancellationRequested)
+                                        throw new TaskCanceledException();
+
+                                    return formattedSearchResults;
+                                })
+                            .Catch(Observable.Return(Enumerable.Empty<ViewModels.SearchResult>())))
+                    .Switch()
+                    //This creates the subscription and provides a way to gather our data
+                    .Subscribe(
+                        results =>
+                        {
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                try
+                                {
+                                    search.IsEnabled = false;
+
+                                    searchResults.ItemsSource = results;
+                                }
+                                finally
+                                {
+                                    search.IsEnabled = true;
+                                }
+                            });                        
+                        })
+                        
 			);
 		}
 
@@ -86,42 +128,6 @@ namespace ReactiveExtensionExamples.Pages
 
 			//TODO: SWRE - Item 4 - Cleanup our subscriptions
 			eventSubscriptions.Clear();
-		}
-
-		//TODO: SWRE - Item 5 - Perform the search
-		async Task DoSearch(string searchText) {
-			try
-			{
-				Device.BeginInvokeOnMainThread(() => search.IsEnabled = false);
-
-				if (string.IsNullOrEmpty(searchText))
-				{
-					Device.BeginInvokeOnMainThread(() => searchResults.ItemsSource = null);
-					return;
-				}
-
-				var searchService = Locator.CurrentMutable.GetService<IDuckDuckGoApi>();
-				var searchResult = await searchService.Search(searchText);
-				var formattedSearchResults =
-					searchResult.RelatedTopics
-						.Select(rt =>
-							new ViewModels.SearchResult
-							{
-								DisplayText = rt.Text,
-								ImageUrl = rt?.Icon?.Url ?? string.Empty
-							});
-
-				Device.BeginInvokeOnMainThread(() => searchResults.ItemsSource = formattedSearchResults);
-			}
-			catch (Exception ex)
-			{
-                Device.BeginInvokeOnMainThread(async () =>
-                    await this.DisplayAlert("Exception", "There was a failure performing a search", "OK"));
-			}
-			finally
-			{
-				Device.BeginInvokeOnMainThread(() => search.IsEnabled = true);
-			}
 		}
 
 		class DuckDuckGoResultCell : ViewCell
