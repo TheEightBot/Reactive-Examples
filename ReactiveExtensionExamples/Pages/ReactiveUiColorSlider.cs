@@ -50,8 +50,8 @@ namespace ReactiveExtensionExamples.Pages
                     .DisposeWith(disposables);
     
                 this.WhenAnyValue (x => x.ViewModel.Color)
-                    .ObserveOn (RxApp.MainThreadScheduler)
                     .Select (color => Color.FromRgba (color.R, color.G, color.B, color.A))
+                    .ObserveOn (RxApp.MainThreadScheduler)
                     .BindTo (this, x => x.colorDisplay.BackgroundColor)
                     .DisposeWith(disposables);
             });
