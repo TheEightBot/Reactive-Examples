@@ -77,6 +77,9 @@ namespace ReactiveExtensionExamples.Pages
 						case NavigationPages.RxUiLogin:
 							selectedPage = new Pages.ReactiveUiLogin();
 							break;
+                        case NavigationPages.RxUiXamarinEssentials:
+                            selectedPage = new Pages.ReactiveUiEssentials();
+                            break;
 						default:
 						break;
 					}
@@ -108,7 +111,8 @@ namespace ReactiveExtensionExamples.Pages
 			RxUiLogin,
 			StandardSearch,
 			SearchWithReactiveExtensions,
-			RxUiSearch
+			RxUiSearch,
+            RxUiXamarinEssentials
 		}
 
 		class NavListPage : ContentPage {
@@ -226,6 +230,12 @@ namespace ReactiveExtensionExamples.Pages
 					Command = new Command(() => selectedNavigation.OnNext(NavigationPages.RxUiLogin)),
 				};
 				navigationContainer.Children.Add(rxuiLogin);
+                
+                var rxuiEssentials = new Button { 
+                    Text = "RxUI - Xamarin Essentials",
+                    Command = new Command(() => selectedNavigation.OnNext(NavigationPages.RxUiXamarinEssentials)),
+                };
+                navigationContainer.Children.Add(rxuiEssentials);
 
 				var reactiveLogo = new Image { 
 					Source = "reactive_logo.png",
