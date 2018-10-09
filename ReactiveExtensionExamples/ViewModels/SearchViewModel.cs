@@ -13,6 +13,7 @@ using ReactiveExtensionExamples.Services.Api;
 using ReactiveUI;
 using Splat;
 using System.Reactive.Disposables;
+using ReactiveUI.Legacy;
 
 namespace ReactiveExtensionExamples.ViewModels
 {

@@ -30,7 +30,7 @@ namespace ReactiveExtensionExamples.ViewModels
                 {
                     var gyroscopeChanged = 
                         Observable
-                            .FromEvent<AccelerometerChangedEventHandler, AccelerometerChangedEventArgs>(
+                            .FromEvent<EventHandler<AccelerometerChangedEventArgs>, AccelerometerChangedEventArgs>(
                                 x => Accelerometer.ReadingChanged += x,
                                 x => Accelerometer.ReadingChanged -= x)
                             .SubscribeOn(RxApp.TaskpoolScheduler)
@@ -39,7 +39,7 @@ namespace ReactiveExtensionExamples.ViewModels
                             .Do(x => 
                             {
                                 if (!Accelerometer.IsMonitoring)
-                                    Accelerometer.Start(SensorSpeed.Ui);
+                                    Accelerometer.Start(SensorSpeed.UI);
                             })
                             .Finally(() => {
                                 Accelerometer.Stop();

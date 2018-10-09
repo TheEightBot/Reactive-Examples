@@ -99,6 +99,19 @@
         <Reference Include="System.Xml" />
         <Reference Include="System.Core" />
         <Reference Include="Xamarin.iOS" />
+        <Reference Include="System.Runtime.Serialization" />
+        <PackageReference Include="Xamarin.Forms">
+          <Version>3.2.0.871581</Version>
+        </PackageReference>
+        <PackageReference Include="ReactiveUI">
+          <Version>9.0.1</Version>
+        </PackageReference>
+        <PackageReference Include="ReactiveUI.XamForms">
+          <Version>9.0.1</Version>
+        </PackageReference>
+        <PackageReference Include="Xamarin.Essentials">
+          <Version>0.10.0-preview</Version>
+        </PackageReference>
     </ItemGroup>
     <ItemGroup>
         <BundleResource Include="Resources\Default.png" />
