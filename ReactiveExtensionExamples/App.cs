@@ -10,7 +10,7 @@ namespace ReactiveExtensionExamples
 		public App ()
 		{
 			Values.Styles.Initialize ();
-			MainPage = new Pages.NavigationContainerPage ();
+			MainPage = new UserInterface.Pages.NavigationContainerPage ();
 		}
 
 		protected override void OnStart ()

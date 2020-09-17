@@ -30,7 +30,8 @@ namespace ReactiveExtensionExamples.Values
 			return new Style (typeof(NavigationPage))
 				.Set (NavigationPage.BarBackgroundColorProperty, Indigo)
 				.Set (NavigationPage.BarTextColorProperty, Color.White)
-				.Set (NavigationPage.IconProperty, "slideout.png");
+				.Set (NavigationPage.IconImageSourceProperty, "slideout.png")
+				.Set(NavigationPage.IconColorProperty, Color.White);
 		}
 
 		static Style CreateReactiveButtonStyle (){

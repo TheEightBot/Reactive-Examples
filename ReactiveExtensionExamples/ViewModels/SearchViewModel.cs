@@ -14,6 +14,8 @@ using ReactiveUI;
 using Splat;
 using System.Reactive.Disposables;
 using ReactiveUI.Legacy;
+using DynamicData;
+using System.ComponentModel;
 
 namespace ReactiveExtensionExamples.ViewModels
 {
@@ -28,8 +30,15 @@ namespace ReactiveExtensionExamples.ViewModels
             set { this.RaiseAndSetIfChanged(ref _searchQuery, value); }
         }
 
-        readonly ReactiveList<SearchResult> _searchResults = new ReactiveList<SearchResult>();
-        public ReactiveList<SearchResult> SearchResults => _searchResults;
+        private SourceList<SearchResult> _searchResultSource = new SourceList<SearchResult>();
+
+        ReadOnlyObservableCollection<SearchResult> _searchResults;
+
+        public ReadOnlyObservableCollection<SearchResult> SearchResults
+        {
+            get => _searchResults;
+            private set => this.RaiseAndSetIfChanged(ref _searchResults, value);
+        }
 
         ReactiveCommand<string, List<SearchResult>> _search;
         public ReactiveCommand<string, List<SearchResult>> Search
@@ -38,12 +47,23 @@ namespace ReactiveExtensionExamples.ViewModels
             private set { this.RaiseAndSetIfChanged(ref _search, value); }
         }
 
-        public Interaction<string, Unit> SearchError { get; private set; } = new Interaction<string, Unit>();
+        public Interaction<string, bool> SearchError { get; private set; } = new Interaction<string, bool>();
 
         public SearchViewModel()
         {
             this.WhenActivated((CompositeDisposable disposables) =>
             {
+                _searchResultSource = new SourceList<SearchResult>().DisposeWith(disposables);
+
+                _searchResultSource
+                    .Connect()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Bind(out var searchResultsBinding)
+                    .Subscribe()
+                    .DisposeWith(disposables);
+
+                this.SearchResults = searchResultsBinding;
+
                 // ReactiveCommand has built-in support for background operations and
                 // guarantees that this block will only run exactly once at a time, and
                 // that the CanExecute will auto-disable and that property IsExecuting will
@@ -64,7 +84,7 @@ namespace ReactiveExtensionExamples.ViewModels
                             if (DateTime.Now.Second % 9 == 0)
                                 throw new TimeoutException("Unable to connect to web service");
 
-                            var searchService = Locator.CurrentMutable.GetService<IDuckDuckGoApi>();
+                            var searchService = Locator.Current.GetService<IDuckDuckGoApi>();
                             var searchResult = await searchService.Search(searchQuery);
 
                             return searchResult
@@ -94,10 +114,13 @@ namespace ReactiveExtensionExamples.ViewModels
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(searchResults =>
                     {
-                        using(SearchResults.SuppressChangeNotifications()){
-                            SearchResults.Clear();
-                            SearchResults.AddRange(searchResults);
-                        }
+                        _searchResultSource
+                            .Edit(
+                                list =>
+                                {
+                                    list.Clear();
+                                    list.AddRange(searchResults);
+                                });
                     })
                     .DisposeWith(disposables);
 

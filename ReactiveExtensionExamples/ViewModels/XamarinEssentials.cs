@@ -42,7 +42,14 @@ namespace ReactiveExtensionExamples.ViewModels
                                     Accelerometer.Start(SensorSpeed.UI);
                             })
                             .Finally(() => {
-                                Accelerometer.Stop();
+                                try
+                                {
+                                    Accelerometer.Stop();
+                                }
+                                catch (FeatureNotSupportedException)
+                                {
+
+                                }
                             })
                             .Throttle(TimeSpan.FromMilliseconds(20))
                             .Do(x => System.Diagnostics.Debug.WriteLine($"ACC: {x}"))
