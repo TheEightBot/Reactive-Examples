@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace ReactiveExtensionExamples.UserInterface.Pages.DynamicData
 {
-    public class FilterDynamicData : ReactiveContentPage<ViewModels.DynamicData.SimpleDynamicDataViewModel>
+    public class FilterDynamicData : ReactiveContentPage<ViewModels.DynamicData.FilterDynamicDataViewModel>
 	{
 		Entry textEntry;
 		CollectionView searchResults;
@@ -20,7 +20,7 @@ namespace ReactiveExtensionExamples.UserInterface.Pages.DynamicData
 		public FilterDynamicData () {
 			Title = "Rx - Filter Dynamic Data";
 
-			this.ViewModel = new ViewModels.DynamicData.SimpleDynamicDataViewModel();
+			this.ViewModel = new ViewModels.DynamicData.FilterDynamicDataViewModel();
 
 			Content = new StackLayout
 			{

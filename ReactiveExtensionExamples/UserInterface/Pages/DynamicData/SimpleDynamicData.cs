@@ -43,13 +43,13 @@ namespace ReactiveExtensionExamples.UserInterface.Pages.DynamicData
                 this.Bind(ViewModel, x => x.SearchQuery, c => c.textEntry.Text)
                     .DisposeWith(disposables);
                     
-                this.BindCommand(ViewModel, x => x.Search, c => c.search, this.WhenAnyValue(x => x.ViewModel.SearchQuery))
-                    .DisposeWith(disposables);
-    
                 //This is a one-way bind
                 this.OneWayBind(ViewModel, x => x.SearchResults, c => c.searchResults.ItemsSource)
                     .DisposeWith(disposables);
 
+                this.BindCommand(ViewModel, x => x.Search, c => c.search)//this.WhenAnyValue(x => x.ViewModel.SearchQuery)
+					.DisposeWith(disposables);
+   
 				this.WhenAnyValue(x => x.ViewModel)
 					.Where(x => x != null)
 					.SelectUnit()
