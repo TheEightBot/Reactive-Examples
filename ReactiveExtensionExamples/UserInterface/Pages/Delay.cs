@@ -39,6 +39,7 @@ namespace ReactiveExtensionExamples.UserInterface.Pages
                 .Delay (TimeSpan.FromSeconds (3))
 
 				.Select(args => args.EventArgs.NewTextValue)
+				.StartWith(string.Empty)
                 .Subscribe(text => {
                     Device.BeginInvokeOnMainThread(() => {
                         lastEntries.Children
