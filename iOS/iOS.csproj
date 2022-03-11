@@ -101,16 +101,16 @@
         <Reference Include="Xamarin.iOS" />
         <Reference Include="System.Runtime.Serialization" />
         <PackageReference Include="Xamarin.Forms">
-          <Version>4.8.0.1451</Version>
+          <Version>5.0.0.2337</Version>
         </PackageReference>
         <PackageReference Include="ReactiveUI">
-          <Version>11.5.35</Version>
+          <Version>17.1.50</Version>
         </PackageReference>
         <PackageReference Include="ReactiveUI.XamForms">
-          <Version>11.5.35</Version>
+          <Version>17.1.50</Version>
         </PackageReference>
         <PackageReference Include="Xamarin.Essentials">
-          <Version>1.5.3.2</Version>
+          <Version>1.7.1</Version>
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
