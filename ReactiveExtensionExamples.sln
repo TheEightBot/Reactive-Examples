@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveDotNetCoreApi", "Re
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mobile", "Mobile", "{E9773837-BF86-46C1-AA2E-C1ECE465C855}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveDotNetCoreConsole", "ReactiveDotNetCoreConsole\ReactiveDotNetCoreConsole.csproj", "{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,22 @@ Global
 		{AFB538F3-98AD-479F-93F5-1DF2937F4D06}.Ad-Hoc|iPhone.Build.0 = Release|Any CPU
 		{AFB538F3-98AD-479F-93F5-1DF2937F4D06}.AppStore|iPhone.ActiveCfg = Release|Any CPU
 		{AFB538F3-98AD-479F-93F5-1DF2937F4D06}.AppStore|iPhone.Build.0 = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Release|iPhone.Build.0 = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Ad-Hoc|iPhone.ActiveCfg = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.Ad-Hoc|iPhone.Build.0 = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.AppStore|iPhone.ActiveCfg = Release|Any CPU
+		{0C92C783-D4CA-405C-9DA8-DF7A7B2AD562}.AppStore|iPhone.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3B2BD6CA-BFCA-4640-940E-624FABAEF8C7} = {E9773837-BF86-46C1-AA2E-C1ECE465C855}
