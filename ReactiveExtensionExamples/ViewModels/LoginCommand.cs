@@ -10,7 +10,7 @@ namespace ReactiveExtensionExamples.ViewModels
 {
 	public class Login : ReactiveObject
 	{
-		string _emailAddress;
+        string _emailAddress;
 		public string EmailAddress {
 			get { return _emailAddress; }
 			set { this.RaiseAndSetIfChanged (ref _emailAddress, value); }
@@ -33,7 +33,7 @@ namespace ReactiveExtensionExamples.ViewModels
 			get { return _isValid?.Value ?? false; }
 		}
 
-		public ReactiveCommand<object, Unit> PerformLogin;
+		public ReactiveCommand<Unit, Unit> PerformLogin;
 
 		public Login ()
 		{
@@ -54,21 +54,27 @@ namespace ReactiveExtensionExamples.ViewModels
 					))
 				.ToProperty(this, v => v.IsValid, out _isValid);
 
-			var canExecuteLogin = 
-				this.WhenAnyValue (x => x.IsLoading, x => x.IsValid, 
-					(isLoading, IsValid) => !isLoading && IsValid)
-				    .Do(x => System.Diagnostics.Debug.WriteLine($"Can Login: {x}"));
-			
-			PerformLogin = ReactiveCommand.CreateFromTask<object, Unit> (
-				async _ => {
-					var random = new Random(Guid.NewGuid().GetHashCode());
-					await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
+			var canExecuteLogin =
+				Observable
+					.CombineLatest(
+						this.WhenAnyValue(x => x.IsLoading),
+						this.WhenAnyValue(x => x.IsValid),
+						(isLoading, isValid) => !isLoading && isValid)
+					.Do(x => System.Diagnostics.Debug.WriteLine($"Can Login: {x}"));
 
-					return Unit.Default;
-				},
-                canExecuteLogin);
+            PerformLogin =
+				ReactiveCommand
+					.CreateFromTask<Unit, Unit>(
+						async _ =>
+						{
+							var random = new Random(Guid.NewGuid().GetHashCode());
+							await Task.Delay (random.Next(250, 10000)) /* Fake Web Service Call */;
 
-            this.WhenAnyObservable(x => x.PerformLogin.IsExecuting)
+							return Unit.Default;
+						},
+						canExecuteLogin);
+
+			this.WhenAnyObservable(x => x.PerformLogin.IsExecuting)
                 .StartWith(false)
 				.ToProperty (this, x => x.IsLoading, out _isLoading);
 		}
