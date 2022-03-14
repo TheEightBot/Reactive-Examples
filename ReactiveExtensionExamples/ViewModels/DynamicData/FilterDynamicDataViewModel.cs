@@ -20,6 +20,7 @@ using ReactiveExtensionExamples.Models;
 using System.Threading;
 using System.Net.Http;
 using ReactiveUI.Fody.Helpers;
+using DynamicData.Aggregation;
 
 namespace ReactiveExtensionExamples.ViewModels.DynamicData
 {
@@ -34,7 +35,14 @@ namespace ReactiveExtensionExamples.ViewModels.DynamicData
         public IEnumerable<RssEntry> SearchResults { get; private set; }
 
         [Reactive]
+        public int ResultCount { get; set; }
+
+        [Reactive]
         public ReactiveCommand<Unit, Unit> Search { get; private set; }
+
+        [Reactive]
+        public ReactiveCommand<Unit, Unit> CancelSearch { get; private set; }
+
 
         public FilterDynamicDataViewModel ()
         {
@@ -42,8 +50,35 @@ namespace ReactiveExtensionExamples.ViewModels.DynamicData
             {
                 _searchResultSource = new SourceList<RssEntry>().DisposeWith(disposables);
 
-                _searchResultSource
-                    .Connect()
+                var filter =
+                    this.WhenAnyValue(x => x.SearchQuery)
+                        .SubscribeOn(RxApp.TaskpoolScheduler)
+                        .Select(
+                            search =>
+                            {
+                                var searchIsEmpty = string.IsNullOrEmpty(search);
+
+                                return new Func<RssEntry, bool>(
+                                    value =>
+                                    {
+                                        if (searchIsEmpty)
+                                        {
+                                            return true;
+                                        }
+
+                                        return FuzzySharp.Fuzz.PartialRatio(value.Title, search) > 75;
+                                    });
+                            });
+
+                var filteredData =
+                    _searchResultSource
+                        .Connect()
+                        .SubscribeOn(RxApp.MainThreadScheduler)
+                        .Filter(filter)
+                        .Publish()
+                        .RefCount();
+
+                filteredData
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Bind(out var searchResultsBinding)
                     .Subscribe()
@@ -51,22 +86,50 @@ namespace ReactiveExtensionExamples.ViewModels.DynamicData
 
                 this.SearchResults = searchResultsBinding;
 
+                filteredData
+                    .Count()
+                    .BindTo(this, x => x.ResultCount)
+                    .DisposeWith(disposables);
+
+                CancelSearch = 
+                    ReactiveCommand
+                        .Create(() => {})
+                        .DisposeWith(disposables);
+
                 Search =
                     ReactiveCommand
-                    .CreateFromTask(
-                        async (ct) =>
-                        {
-                            var worldNews = await RssDownloader.DownloadRss("https://www.reddit.com/r/worldnews/new/.rss", ct).ConfigureAwait(false);
+                        .CreateFromObservable(
+                            () =>
+                            {
+                                return Observable
+                                    .StartAsync(
+                                        async (ct) =>
+                                        {
+                                            var worldNews = await RssDownloader.DownloadRss("https://www.reddit.com/r/worldnews/new/.rss", ct).ConfigureAwait(false);
 
-                            _searchResultSource
-                                .Edit(
-                                    innerList =>
-                                    {
-                                        innerList.Clear();
-                                        innerList.AddRange(worldNews);
-                                    });
-                        })
+                                            if(ct.IsCancellationRequested)
+                                            {
+                                                return;
+                                            }
+
+                                            _searchResultSource
+                                                .Edit(
+                                                    innerList =>
+                                                    {
+                                                        innerList.Clear();
+                                                        innerList.AddRange(worldNews);
+                                                    });
+                                        })
+                                    .TakeUntil(this.CancelSearch)
+                                    .SelectUnit();
+                            })
                     .DisposeWith(disposables);
+
+                Observable
+                    .Merge(
+                        this.ThrownExceptions,
+                        Search.ThrownExceptions)
+                    .Do(ex => System.Diagnostics.Debug.WriteLine($"ERROR!!: {ex}"));
             });
 
         }

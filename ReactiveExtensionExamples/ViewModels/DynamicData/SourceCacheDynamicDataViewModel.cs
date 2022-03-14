@@ -52,7 +52,10 @@ namespace ReactiveExtensionExamples.ViewModels.DynamicData
                     .SubscribeOn(RxApp.TaskpoolScheduler)
                     .OnItemAdded(x => x.New = true)
                     .OnItemUpdated((current, previous) => current.New = false)
-                    .Sort(SortExpressionComparer<RssEntry>.Descending(x => x.New).ThenByDescending(x => x.Updated))
+                    .Sort(
+                        SortExpressionComparer<RssEntry>
+                            .Descending(x => x.New)
+                            .ThenByDescending(x => x.Updated))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Bind(out var searchResultsBinding)
                     .Subscribe()
