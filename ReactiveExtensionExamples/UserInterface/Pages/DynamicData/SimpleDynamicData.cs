@@ -11,7 +11,6 @@ namespace ReactiveExtensionExamples.UserInterface.Pages.DynamicData
 {
     public class SimpleDynamicData : ReactiveContentPage<ViewModels.DynamicData.SimpleDynamicDataViewModel>
 	{
-		Entry textEntry;
 		CollectionView searchResults;
         Button search;
 		ActivityIndicator _loading;
@@ -26,7 +25,6 @@ namespace ReactiveExtensionExamples.UserInterface.Pages.DynamicData
 			{
 				Padding = new Thickness(8d),
 				Children = {
-					(textEntry = new Entry{ Placeholder = "Enter Search Terms" }),
                     (search = new Button{ Text = "Search" }),
 					(_loading = new ActivityIndicator{}),
 					(searchResults = new CollectionView() {
@@ -40,8 +38,6 @@ namespace ReactiveExtensionExamples.UserInterface.Pages.DynamicData
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {            
-                this.Bind(ViewModel, x => x.SearchQuery, c => c.textEntry.Text)
-                    .DisposeWith(disposables);
                     
                 //This is a one-way bind
                 this.OneWayBind(ViewModel, x => x.SearchResults, c => c.searchResults.ItemsSource)

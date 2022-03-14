@@ -20,22 +20,15 @@ using ReactiveExtensionExamples.Models;
 using System.Threading;
 using System.Net.Http;
 using ReactiveUI.Fody.Helpers;
-using DynamicData.Aggregation;
 
 namespace ReactiveExtensionExamples.ViewModels.DynamicData
 {
     public class SimpleDynamicDataViewModel : ViewModelBase
     {
-        [Reactive]
-        public string SearchQuery { get; set; }
-
         private SourceList<RssEntry> _searchResultSource = new SourceList<RssEntry>();
 
         [Reactive]
         public IEnumerable<RssEntry> SearchResults { get; private set; }
-
-        [Reactive]
-        public int ResultCount { get; set; }
 
         [Reactive]
         public ReactiveCommand<Unit, Unit> Search { get; private set; }
@@ -44,37 +37,12 @@ namespace ReactiveExtensionExamples.ViewModels.DynamicData
         {
             this.WhenActivated((CompositeDisposable disposables) =>
             {
-                _searchResultSource = new SourceList<RssEntry>().DisposeWith(disposables);
+                _searchResultSource =
+                    new SourceList<RssEntry>()
+                        .DisposeWith(disposables);
 
-                var filter =
-                    this.WhenAnyValue(x => x.SearchQuery)
-                        .SubscribeOn(RxApp.MainThreadScheduler)
-                        .Select(
-                            search =>
-                            {
-                                var searchIsEmpty = string.IsNullOrEmpty(search);
-
-                                return new Func<RssEntry, bool>(
-                                    value =>
-                                    {
-                                        if (searchIsEmpty)
-                                        {
-                                            return true;
-                                        }
-
-                                        return FuzzySharp.Fuzz.PartialRatio(value.Title, search) > 75;
-                                    });
-                            });
-
-                var filteredData =
-                    _searchResultSource
-                        .Connect()
-                        .SubscribeOn(RxApp.MainThreadScheduler)
-                        .Filter(filter)
-                        .Publish()
-                        .RefCount();
-
-                filteredData
+                _searchResultSource
+                    .Connect()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Bind(out var searchResultsBinding)
                     .Subscribe()
@@ -82,17 +50,15 @@ namespace ReactiveExtensionExamples.ViewModels.DynamicData
 
                 this.SearchResults = searchResultsBinding;
 
-                filteredData
-                    .Count()
-                    .BindTo(this, x => x.ResultCount)
-                    .DisposeWith(disposables);
-
                 Search =
                     ReactiveCommand
                     .CreateFromTask(
                         async (ct) =>
                         {
-                            var worldNews = await RssDownloader.DownloadRss("https://www.reddit.com/r/worldnews/new/.rss", ct).ConfigureAwait(false);
+                            var worldNews =
+                                await RssDownloader
+                                    .DownloadRss("https://www.reddit.com/r/worldnews/new/.rss", ct)
+                                    .ConfigureAwait(false);
 
                             _searchResultSource
                                 .Edit(
