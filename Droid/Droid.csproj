@@ -52,16 +52,16 @@
         <PackageReference Include="Xamarin.Android.Support.v7.MediaRouter" Version="28.0.0.3" />
         <PackageReference Include="Xamarin.Android.Support.CustomTabs" Version="28.0.0.3" />
         <PackageReference Include="Xamarin.Forms">
-          <Version>5.0.0.2337</Version>
+          <Version>5.0.0.2401</Version>
         </PackageReference>
         <PackageReference Include="ReactiveUI">
-          <Version>17.1.50</Version>
+          <Version>18.0.7</Version>
         </PackageReference>
         <PackageReference Include="ReactiveUI.XamForms">
-          <Version>17.1.50</Version>
+          <Version>18.0.7</Version>
         </PackageReference>
         <PackageReference Include="Xamarin.Essentials">
-          <Version>1.7.1</Version>
+          <Version>1.7.2</Version>
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
