@@ -40,8 +40,8 @@ namespace ReactiveExtensionExamples.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _searchResults, value);
         }
 
-        ReactiveCommand<string, List<SearchResult>> _search;
-        public ReactiveCommand<string, List<SearchResult>> Search
+        ReactiveCommand<string, IEnumerable<SearchResult>> _search;
+        public ReactiveCommand<string, IEnumerable<SearchResult>> Search
         {
             get { return _search; }
             private set { this.RaiseAndSetIfChanged(ref _search, value); }
@@ -70,7 +70,7 @@ namespace ReactiveExtensionExamples.ViewModels
                 // be set according whilst it is running.
                 Search =
                     ReactiveCommand
-                    .CreateFromTask<string, List<SearchResult>>(
+                    .CreateFromTask<string, IEnumerable<SearchResult>>(
                         // Here we're describing here, in a *declarative way*, the conditions in
                         // which the Search command is enabled.  Now our Command IsEnabled is
                         // perfectly efficient, because we're only updating the UI in the scenario
@@ -79,6 +79,11 @@ namespace ReactiveExtensionExamples.ViewModels
                         {
                             var random = new Random(Guid.NewGuid().GetHashCode());
                             await Task.Delay(random.Next(250, 2500));
+
+                            if(string.IsNullOrEmpty(searchQuery))
+                            {
+                                return Enumerable.Empty<SearchResult>();
+                            }
 
                             //This is just here so simulate a network type exception
                             if (DateTime.Now.Second % 9 == 0)
@@ -96,14 +101,7 @@ namespace ReactiveExtensionExamples.ViewModels
                                         ImageUrl = rt?.Icon?.Url ?? string.Empty
                                     })
                                 .ToList();
-                        },
-                        Observable
-                            .CombineLatest(
-                                this.WhenAnyValue(vm => vm.SearchQuery).Select(searchQuery => !string.IsNullOrEmpty(searchQuery)).DistinctUntilChanged(),
-                                this.WhenAnyObservable(x => x.Search.IsExecuting).DistinctUntilChanged(),
-                                (hasSearchQuery, isExecuting) => hasSearchQuery && !isExecuting)
-                            .Do(cps => System.Diagnostics.Debug.WriteLine($"Can Perform Search: {cps}"))
-                            .DistinctUntilChanged())
+                        })
                     .DisposeWith(disposables);
 
                 //// ReactiveCommands are themselves IObservables, whose value are the results

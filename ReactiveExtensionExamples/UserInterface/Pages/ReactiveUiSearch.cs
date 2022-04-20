@@ -2,20 +2,21 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.XamForms;
 using Xamarin.Forms;
-using System.Runtime.InteropServices;
 
 namespace ReactiveExtensionExamples.UserInterface.Pages
 {
     public class ReactiveUiSearch : ReactiveContentPage<ViewModels.SearchViewModel>
 	{
-		Entry textEntry;
-		ListView searchResults;
-        Button search;
-		ActivityIndicator _loading;
-        SerialDisposable _searchErrorDisposable;
+        private Entry _textEntry;
+        private ListView _searchResults;
+        private RefreshView _pullToRefresh;
+        private Button _search;
+        private ActivityIndicator _loading;
+        private SerialDisposable _searchErrorDisposable;
         
 		public ReactiveUiSearch() {
 			Title = "Rx - Search";
@@ -25,33 +26,59 @@ namespace ReactiveExtensionExamples.UserInterface.Pages
 			Content = new StackLayout
 			{
 				Padding = new Thickness(8d),
-				Children = {
-					(textEntry = new Entry{ Placeholder = "Enter Search Terms" }),
-                    (search = new Button{ Text = "Search" }),
+				Children =
+                {
+					(_textEntry = new Entry{ Placeholder = "Enter Search Terms" }),
+                    (_search = new Button{ Text = "Search" }),
 					(_loading = new ActivityIndicator{}),
-					(searchResults = new ListView(ListViewCachingStrategy.RecycleElement) {
-						VerticalOptions = LayoutOptions.FillAndExpand,
-						HorizontalOptions = LayoutOptions.FillAndExpand,
-						ItemTemplate = new DataTemplate(typeof(DuckDuckGoResultCell))
-					})
+                    (_pullToRefresh =
+                        new RefreshView
+                        {
+                            Content =
+                                _searchResults =
+                                    new ListView(ListViewCachingStrategy.RecycleElement)
+                                    {
+                                        ItemTemplate = new DataTemplate(typeof(DuckDuckGoResultCell))
+                                    },
+                            HorizontalOptions = LayoutOptions.FillAndExpand,
+                            VerticalOptions = LayoutOptions.FillAndExpand,
+                        }),
 				}
 			};
 
-            this.WhenActivated((CompositeDisposable disposables) =>
+            this.WhenActivated(
+                (CompositeDisposable disposables) =>
             {
                 _searchErrorDisposable?.Dispose();
                 _searchErrorDisposable = new SerialDisposable();
             
                 //TODO: RxSUI - Item 1 - Here we are just setting up bindings to our UI Elements
                 //This is a two-way bind
-                this.Bind(ViewModel, x => x.SearchQuery, c => c.textEntry.Text)
+                this.Bind(ViewModel, x => x.SearchQuery, c => c._textEntry.Text)
                     .DisposeWith(disposables);
                     
-                this.BindCommand(ViewModel, x => x.Search, c => c.search, this.WhenAnyValue(x => x.ViewModel.SearchQuery))
+                this.BindCommand(ViewModel, x => x.Search, c => c._search, this.WhenAnyValue(x => x.ViewModel.SearchQuery))
                     .DisposeWith(disposables);
-    
+
+                //Once this event is fired off, it will start the refresh
+                Observable
+                    .FromEventPattern(
+                        x => _pullToRefresh.Refreshing += x,
+                        x => _pullToRefresh.Refreshing -= x)
+                    .Select(_ => this.WhenAnyValue(x => x.ViewModel.SearchQuery).Take(1))
+                    .Switch()
+                    .InvokeCommand(this, x => x.ViewModel.Search)
+                    .DisposeWith(disposables);
+
+                //This will only trigger when the search command completes
+                this.WhenAnyObservable(x => x.ViewModel.Search)
+                    .Select(_ => false)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .BindTo(this, ui => ui._pullToRefresh.IsRefreshing)
+                    .DisposeWith(disposables);
+
                 //This is a one-way bind
-                this.OneWayBind(ViewModel, x => x.SearchResults, c => c.searchResults.ItemsSource)
+                this.OneWayBind(ViewModel, x => x.SearchResults, c => c._searchResults.ItemsSource)
                     .DisposeWith(disposables);
     
                 //TODO: RxSUI - Item 2 - User error allows us to interact with our users and get feedback on how to handle an exception
